@@ -2,14 +2,7 @@
 
 set -e
 
-cd router-spike
-yarn
-yarn travis
-cd ..
-
-cd dep-loader-spike
-yarn
-yarn travis
-cd ..
+cd router-spike && yarn travis && cd ..
+cd dep-loader-spike && yarn travis && cd ..
 
 exit 0
