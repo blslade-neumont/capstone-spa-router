@@ -1,3 +1,17 @@
 {
-    "extends": "../tsconfig.json"
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src",
+        "baseUrl": ".",
+        "declaration": true,
+        "types": [
+            "core-js"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "bower_components",
+        "dist"
+    ]
 }
