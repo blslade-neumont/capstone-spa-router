@@ -5,8 +5,8 @@
 
 /**/config/local-*
 
-/**/src/*.js
-/**/src/*.js.map
+/**/src/**/*.js
+/**/src/**/*.js.map
 
 /**/npm-debug.log
 /**/yarn-error.log

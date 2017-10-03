@@ -8,7 +8,8 @@
         "url": "http://www.bestoflies.com/"
     },
     "scripts": {
-        "travis": "bash ./scripts/travis.sh"
+        "travis": "bash ./scripts/travis.sh",
+        "deploy": "bash ./scripts/deploy.sh"
     },
     "devDependencies": { },
     "dependencies": { },
