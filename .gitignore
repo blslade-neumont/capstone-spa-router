@@ -1,0 +1,12 @@
+
+
+/**/dist
+/**/node_modules
+
+/**/config/local-*
+
+/**/src/*.js
+/**/src/*.js.map
+
+/**/npm-debug.log
+/**/yarn-error.log

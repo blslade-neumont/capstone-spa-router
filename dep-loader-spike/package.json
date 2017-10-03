@@ -1,0 +1,46 @@
+{
+    "name": "capstone-depl-loader-spike",
+    "version": "0.0.0",
+    "description": "Capstone project for Brandon Slade - dependency loader spike",
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "author": {
+        "name": "Brandon Slade",
+        "email": "brandonyoyoslade@gmail.com",
+        "url": "http://www.bestoflies.com/"
+    },
+    "scripts": {
+        "travis": "echo \"Error: no test specified\" && exit 1"
+    },
+    "devDependencies": {
+        "@types/chai": "^3.4.35",
+        "@types/chai-as-promised": "^0.0.30",
+        "@types/mocha": "^2.2.40",
+        "@types/sinon": "^2.1.1",
+        "@types/sinon-chai": "^2.7.27",
+        "chai": "^3.5.0",
+        "chai-as-promised": "^6.0.0",
+        "istanbul": "^0.4.5",
+        "lodash": "^4.17.4",
+        "mocha": "^3.2.0",
+        "mocha-typescript": "^1.0.23",
+        "remap-istanbul": "^0.9.5",
+        "rimraf": "^2.6.1",
+        "sinon": "^2.1.0",
+        "sinon-chai": "^2.10.0",
+        "ts-node": "^3.0.4",
+        "tslint": "^4.5.1"
+    },
+    "dependencies": {
+        "typescript": "^2.5.3"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/blslade-neumont/capstone-spa-router.git"
+    },
+    "bugs": {
+        "url": "https://github.com/blslade-neumont/capstone-spa-router/issues"
+    },
+    "homepage": "https://github.com/blslade-neumont/capstone-spa-router#readme"
+}

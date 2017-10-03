@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "sourceMap": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "moduleResolution": "node",
+        "removeComments": true,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitThis": true,
+        "strictNullChecks": false,
+        "noImplicitAny": false,
+        "pretty": true,
+        "skipLibCheck": true,
+        "lib": [ "es6", "dom" ]
+    },
+    "compileOnSave": false,
+    "buildOnSave": false
+}
