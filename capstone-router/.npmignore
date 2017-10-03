@@ -1,0 +1,15 @@
+
+
+src
+node_modules
+
+src/**/*.js
+src/**/*.js.map
+
+npm-debug.log
+yarn-error.log
+
+tsconfig.json
+yarn.lock
+.npmignore
+**/.gitignore

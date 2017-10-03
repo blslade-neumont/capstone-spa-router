@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "7"
+  - '7'
 
 before_script:
   - yarn
@@ -9,3 +9,15 @@ before_script:
 
 script:
   - yarn travis -q
+
+before_deploy:
+  - cd capstone-router
+deploy:
+  - provider: npm
+    email: brandonyoyoslade@gmail.com
+    api_key:
+      secure: aHXn30HM+E6Yine4swH8MqvBPHvxqbPty3tR5B1XHagr2DatjW2hajiB9ZYiaPhLal/L+9bazURxVEEcsCKrh9TytzDGplsgK5mBuZxHd+l+c6kTDdJycM/yzWtP2NDXdObtLcDFyVEcMeGq0VL7XNNyfLshLozkNh5aaQmn3tEPlZzuCabgKX3lNA1/trVL60sOe/H4OnTiZ11f/58Q/1LhwiZmhgrrUX4L3+2Zphu1OtVIWm5lSQIR4LJzQCT+WjoWj5Njct4awo+FU8Y4dc5ui7ElP6cPmpbm4cFsGhi7FJ4bwQsoXSGk7z5CFIKVUsmBmKL1YHG6/RPt8RFkwL01//TfNYZ0XSrD5SDpAQ+0xfKS9nVZBZdr9nc/KIXGwyKbFS0zJbuZj3hOxRfoDm61jrpPs5iHVrLUj9xCXJ2y7A5idIfSYiVrTg0UiGsfbZ+DPfJRZTVV0jZCuH36CAArXjGr1CfDoaDlGQ9SjuJno/qbQsQ92X5f4ioAAsu1L/7Cn1ymjUBg/TVzfYDOuqVHKPJbUycnUPvE5bxbV9eVPfgLNmq0Wx1F0ZGg9zbXUBDkJ4PXRN6bR9wWpgBfb7wfzrkgADItpIQIHrUh8L37FYRkaP4mv/2tpU7BYkGDR+9srofg1/akvaSMk3xZK1z16omwRLTnKQUmkQz5H/U=
+    on:
+      branch: master
+      tags: true
+      repo: blslade-neumont/capstone-spa-router
