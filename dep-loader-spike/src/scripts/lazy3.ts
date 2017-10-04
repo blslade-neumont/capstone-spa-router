@@ -1,3 +1,3 @@
+import { appendText } from '../util/append-text';
 
-
-document.writeln('lazy3');
+appendText('lazy3');
