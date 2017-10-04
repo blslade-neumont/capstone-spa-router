@@ -1,0 +1,3 @@
+
+
+document.writeln('lazy3');
