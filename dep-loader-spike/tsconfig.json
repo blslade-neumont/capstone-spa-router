@@ -4,7 +4,6 @@
         "outDir": "dist",
         "rootDir": "src",
         "baseUrl": ".",
-        "declaration": true,
         "types": [
             "core-js"
         ]

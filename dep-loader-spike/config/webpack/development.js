@@ -15,6 +15,7 @@ let $raw = {
 
 let devConfig = {
     entry: {
+        'capstone-loader': './src/scripts/capstone-loader.ts',
         'lazy1': './src/scripts/lazy1.ts',
         'lazy2': './src/scripts/lazy2.ts',
         'lazy3': './src/scripts/lazy3.ts'
