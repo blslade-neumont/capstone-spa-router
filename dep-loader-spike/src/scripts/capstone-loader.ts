@@ -62,6 +62,7 @@ declare let global: any;
                 loadPromise: promise,
                 content: void(0)
             };
+            resources.set(path, resource);
             let req = new XMLHttpRequest();
             req.onreadystatechange = function(this: XMLHttpRequest, e: Event) {
                 if (this.readyState !== XMLHttpRequest.DONE) return;
@@ -88,6 +89,7 @@ declare let global: any;
                 isContent: false,
                 loadPromise: promise
             };
+            resources.set(path, resource);
             let script = document.createElement('script');
             script.src = path;
             document.head.appendChild(script);
@@ -112,7 +114,7 @@ declare let global: any;
     }
     
     function validateSchema(schema: ContentMetaT[]) {
-        let names: string[], content: string[], scripts: string[];
+        let names: string[] = [], content: string[] = [], scripts: string[] = [];
         for (let meta of schema) {
             let name = meta.name;
             let idx = names.indexOf(name);
@@ -140,7 +142,7 @@ declare let global: any;
         let schemaStr = (<ContentResourceT>resources.get(path)).content;
         let schemaObj: any;
         try {
-            schemaObj = JSON.stringify(schemaStr);
+            schemaObj = JSON.parse(schemaStr);
         }
         catch (e) {
             throw new Error(`Failed to parse schema json: ${e.msg || e.message || JSON.stringify(e)}`);
@@ -163,7 +165,7 @@ declare let global: any;
         switch (meta.type) {
         case "text":
             await loadContentResource(meta.src);
-            return (<ContentResourceT>resources.get(name)).content;
+            return (<ContentResourceT>resources.get(meta.src)).content;
             
         case "script":
             await executeScriptResource(meta.src);
@@ -180,7 +182,7 @@ declare let global: any;
     async function getContent(name: string) {
         let resource = content.get(name);
         
-        if (!resource) {
+        if (typeof resource === 'undefined') {
             let contentPromise = getContentImpl(name);
             let resolveFn: any;
             let promise = new Promise<void>(resolve => resolveFn = resolve);
@@ -203,3 +205,7 @@ declare let global: any;
     if (_global.getContent) throw new Error(`Can't overwrite (global/window).getContent.`);
     _global.getContent = getContent;
 })();
+
+declare function getContent(name: string): Promise<any>;
+
+getContent('lazy3-c').then(val => console.log('lazy3-c', val));
