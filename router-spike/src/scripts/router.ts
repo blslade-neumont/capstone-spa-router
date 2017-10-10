@@ -27,6 +27,7 @@ class Router {
     
     private init() {
         this.initOutlet();
+        this.initDOM();
         this.initNavigation();
     }
     private initOutlet() {
@@ -39,6 +40,18 @@ class Router {
         else {
             document.body.appendChild(this._outlet);
         }
+    }
+    private initDOM() {
+        document.addEventListener('click', e => {
+            if (e.target instanceof HTMLAnchorElement) {
+                let href: string | null = e.target.href;
+                href = this.resolveLocalHref(document.location.protocol + '//' + document.location.host, document.location.pathname, href);
+                if (href) {
+                    e.preventDefault();
+                    this.navigateTo(href);
+                }
+            }
+        });
     }
     private initNavigation() {
         this._navigationObservable.subscribe(([route, path, pushState]) => {
@@ -85,6 +98,29 @@ class Router {
             if (route.path === segments[0]) return route;
         }
         return null;
+    }
+    private resolveLocalHref(host: string, path: string, href: string): string | null {
+        if (href.startsWith(host)) href = href.substr(host.length);
+        console.log('resolving local href. path:', path, 'href:', href);
+        if (href.match(/^[a-z0-9]+\:/i)) return null;
+        else if (href.startsWith('/')) return href;
+        
+        let lastIdx: number;
+        href = '../' + href;
+        while (true) {
+            if (href.startsWith('../')) {
+                let lastIdx = path.lastIndexOf('/');
+                if (lastIdx === -1) return null;
+                path = path.substr(0, lastIdx);
+                href = href.substr(3);
+            }
+            else if (href.startsWith('./')) {
+                href = href.substr(2);
+            }
+            else break;
+        }
+        
+        return path + '/' + href;
     }
 }
 
