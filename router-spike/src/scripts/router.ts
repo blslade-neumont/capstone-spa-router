@@ -88,7 +88,6 @@ class Router {
         let newRoute = this.findBestRoute(segments);
         let path = segments.join('/');
         if (!path.startsWith('/')) path = '/' + path;
-        console.log('navigating to', path, '&& route:', newRoute);
         this._navigationSubject.next([newRoute, path, pushState]);
     }
     
@@ -101,7 +100,6 @@ class Router {
     }
     private resolveLocalHref(host: string, path: string, href: string): string | null {
         if (href.startsWith(host)) href = href.substr(host.length);
-        console.log('resolving local href. path:', path, 'href:', href);
         if (href.match(/^[a-z0-9]+\:/i)) return null;
         else if (href.startsWith('/')) return href;
         
