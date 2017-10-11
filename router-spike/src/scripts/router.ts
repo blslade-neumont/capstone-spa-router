@@ -5,13 +5,28 @@ import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/distinctUntilChanged';
 
-class Router {
+export type BeginNavigationEventT = {
+    type: 'begin',
+    route: RouteT | null,
+    path: string
+};
+export type EndNavigationEventT = {
+    type: 'end',
+    route: RouteT | null,
+    path: string
+};
+export type NavigationEventT = BeginNavigationEventT | EndNavigationEventT;
+
+export class Router {
     constructor(private routes: RouteT[]) {
         this._navigationObservable = this._navigationSubject
           .asObservable()
           .distinctUntilChanged((lhs, rhs) => lhs[0] === rhs[0]);
         this._currentRoute = this._navigationObservable
           .map(([route]) => route);
+        
+        this._eventObservable = this._eventSubject
+          .asObservable();
         
         switch (document.readyState) {
         case 'interactive':
@@ -55,6 +70,11 @@ class Router {
     }
     private initNavigation() {
         this._navigationObservable.subscribe(([route, path, pushState]) => {
+            this._eventSubject.next({
+                type: 'begin',
+                route: route,
+                path: path
+            });
             if (!route) {
                 this._outlet.innerHTML = 'Not found';
                 document.title = 'Not Found';
@@ -66,6 +86,12 @@ class Router {
             let historyFn = (pushState ? history.pushState : history.replaceState);
             historyFn = historyFn.bind(history);
             historyFn({ route: route }, document.title, document.location.protocol + '//' + document.location.host + path);
+            if (pushState) window.scrollTo(0, 0);
+            this._eventSubject.next({
+                type: 'end',
+                route: route,
+                path: path
+            });
         });
         this.navigateTo(document.location.pathname, false);
     }
@@ -77,6 +103,12 @@ class Router {
     private _currentRoute: Observable<RouteT | null>;
     get currentRoute() {
         return this._currentRoute;
+    }
+    
+    private _eventSubject: Subject<NavigationEventT> = new Subject<NavigationEventT>();
+    private _eventObservable: Observable<NavigationEventT>;
+    get events() {
+        return this._eventObservable;
     }
     
     navigateTo(url: string, pushState?: boolean);
@@ -122,4 +154,7 @@ class Router {
     }
 }
 
-(<any>window).router = new Router(routes);
+let router = (<any>window).router = new Router(routes);
+router.events.subscribe(e => {
+    console.log(e);
+});
