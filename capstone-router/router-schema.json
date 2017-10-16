@@ -1,0 +1,63 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Router",
+    "type": "object",
+    "properties": {
+        "router": {
+            "type": "object",
+            "oneOf": [{ "$ref": "#/definitions/router" }]
+        },
+        "content": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    { "$ref": "#/definitions/content" },
+                    { "$ref": "#/definitions/dynamic-content" }
+                ]
+            }
+        }
+    },
+    "required": ["router"],
+    "definitions": {
+        "router": {
+            
+        },
+        "content": {
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": ["text"]
+                },
+                "src": {
+                    "type": "string"
+                }
+            },
+            "required": ["name", "type", "src"]
+        },
+        "dynamic-content": {
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": ["script"]
+                },
+                "src": {
+                    "type": "string"
+                },
+                "methodName": {
+                    "type": "string"
+                },
+                "deps": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": ["name", "type", "src", "methodName"]
+        }
+    }
+}
