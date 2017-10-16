@@ -47,6 +47,7 @@
         "@types/core-js": "^0.9.43",
         "awesome-typescript-loader": "^3.2.3",
         "config": "^1.26.2",
+        "map-polyfill": "^0.0.1",
         "typescript": "^2.5.3",
         "webpack": "^3.7.1",
         "webpack-merge": "^4.1.0"

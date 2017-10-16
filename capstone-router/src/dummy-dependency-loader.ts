@@ -12,6 +12,7 @@ export class DummyDependencyLoader extends DependencyLoader {
     
     private contentCache = new Map<string, any>();
     provide<T>(name: string, value: T) {
+        if (!this.has(name)) throw new Error(`Resource '${name}' is not defined in the schema.`);
         if (this.contentCache.has(name)) throw new Error(`A value for resource '${name}' is already provided.`);
         this.contentCache.set(name, value);
     }
@@ -19,8 +20,5 @@ export class DummyDependencyLoader extends DependencyLoader {
         if (this.delay) await delay(this.delay);
         if (!this.contentCache.has(name)) throw new Error(`No value for resource '${name}' has been provided.`);
         return this.contentCache.get(name);
-    }
-    has(name: string) {
-        return this.contentCache.has(name);
     }
 }

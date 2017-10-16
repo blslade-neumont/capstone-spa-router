@@ -36,6 +36,7 @@ module.exports = {
     files: [
         // Polyfills
         './node_modules/promise-polyfill/promise.js',
+        './node_modules/map-polyfill/dist/map.min.js',
         
         // Spec tests.
         './src/**/*.spec.ts'

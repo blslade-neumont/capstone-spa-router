@@ -21,6 +21,7 @@ export abstract class DependencyLoader {
             let name = meta.name;
             let idx = names.indexOf(name);
             if (idx !== -1 || this.schemaMap.has(name)) throw new Error(`Content '${name}' defined twice.`);
+            names.push(name);
             
             let src = meta.src;
             let type = meta.type;
@@ -46,7 +47,7 @@ export abstract class DependencyLoader {
     
     abstract get<T>(name: string): Promise<T>;
     async try<T>(name: string, defaultValue: T): Promise<T> {
-        if (this.has(name)) return defaultValue;
+        if (!this.has(name)) return defaultValue;
         else return await this.get<T>(name);
     }
 }
