@@ -13,33 +13,43 @@
         "access": "public"
     },
     "scripts": {
+        "lint": "bash ./scripts/lint.sh",
         "travis": "bash ./scripts/travis.sh",
-        "test-watch": "mocha-typescript-watch -p tsconfig.json \"dist/**/*.spec.js\"",
-        "test-once": "mocha --require ts-node/register \"src/**/*.spec.ts\"",
-        "test": "yarn test-once -q"
+        "lint-test": "tslint --project ./tsconfig.json -c tslint.json -t stylish -e \"**/*.spec.ts\"",
+        "test": "bash ./scripts/test.sh once",
+        "test-once": "bash ./scripts/test.sh once",
+        "test-watch": "bash ./scripts/test.sh watch"
     },
     "devDependencies": {
-        "@types/chai": "^3.4.35",
-        "@types/chai-as-promised": "^0.0.30",
-        "@types/mocha": "^2.2.40",
-        "@types/sinon": "^2.1.1",
-        "@types/sinon-chai": "^2.7.27",
-        "chai": "^3.5.0",
-        "chai-as-promised": "^6.0.0",
-        "istanbul": "^0.4.5",
-        "lodash": "^4.17.4",
-        "mocha": "^3.2.0",
-        "mocha-typescript": "^1.0.23",
-        "remap-istanbul": "^0.9.5",
+        "@types/jasmine": "^2.5.38",
+        "@types/jasmine-matchers": "^0.2.30",
+        "@types/lodash.merge": "^4.6.3",
+        "jasmine-core": "^2.5.2",
+        "jasmine-matchers": "^0.2.3",
+        "karma": "^1.3.0",
+        "karma-cli": "^1.0.1",
+        "karma-defer-spec-reporter": "^0.0.30",
+        "karma-jasmine": "^1.1.0",
+        "karma-jasmine-matchers": "^3.7.0",
+        "karma-phantomjs-launcher": "^1.0.2",
+        "karma-super-dots-reporter": "^0.1.0",
+        "karma-webpack": "^2.0.4",
+        "lodash.merge": "^4.6.0",
+        "phantomjs-prebuilt": "^2.1.14",
+        "promise-polyfill": "^6.0.2",
         "rimraf": "^2.6.1",
-        "sinon": "^2.1.0",
-        "sinon-chai": "^2.10.0",
-        "ts-node": "^3.0.4",
-        "tslint": "^4.5.1"
+        "toastr": "^2.1.2",
+        "tslint": "^4.5.1",
+        "webpack-dev-server": "^2.5.1",
+        "yargs": "^7.0.2"
     },
     "dependencies": {
         "@types/core-js": "^0.9.43",
-        "typescript": "^2.5.3"
+        "awesome-typescript-loader": "^3.2.3",
+        "config": "^1.26.2",
+        "typescript": "^2.5.3",
+        "webpack": "^3.7.1",
+        "webpack-merge": "^4.1.0"
     },
     "license": "MIT",
     "repository": {

@@ -1,0 +1,9 @@
+{
+    "exclude": [
+        "node_modules",
+        "bower_components",
+        "dist",
+        "src/**/test/*"
+    ],
+    "extends": "./tsconfig.json"
+}

@@ -1,12 +1,7 @@
-/// <reference types="mocha" />
-
-import { expect, use } from 'chai';
-import * as sinon from 'sinon';
-import * as sinonChai from 'sinon-chai';
-use(sinonChai);
+/// <reference types="jasmine" />
 
 describe('capstone-router', () => {
     it('should have a placeholder test', () => {
-        expect(true).to.be.true;
+        expect(true).toBe(true);
     });
 });
