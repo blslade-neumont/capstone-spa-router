@@ -43,6 +43,7 @@ export class Router {
     private init() {
         this.initOutlet();
         this.initDOM();
+        this.initHistory();
         this.initNavigation();
     }
     private initOutlet() {
@@ -68,30 +69,15 @@ export class Router {
             }
         });
     }
+    private initHistory() {
+        window.addEventListener('popstate', e => {
+            let { route, path } = e.state;
+            this.performNavigation(route, path, false, false);
+        });
+    }
     private initNavigation() {
         this._navigationObservable.subscribe(([route, path, pushState]) => {
-            this._eventSubject.next({
-                type: 'begin',
-                route: route,
-                path: path
-            });
-            if (!route) {
-                this._outlet.innerHTML = 'Not found';
-                document.title = 'Not Found';
-            }
-            else {
-                this._outlet.innerHTML = route.template;
-                document.title = route.title || 'Untitled Page';
-            }
-            let historyFn = (pushState ? history.pushState : history.replaceState);
-            historyFn = historyFn.bind(history);
-            historyFn({ route: route }, document.title, document.location.protocol + '//' + document.location.host + path);
-            if (pushState) window.scrollTo(0, 0);
-            this._eventSubject.next({
-                type: 'end',
-                route: route,
-                path: path
-            });
+            this.performNavigation(route, path, pushState);
         });
         this.navigateTo(document.location.pathname, false);
     }
@@ -121,6 +107,33 @@ export class Router {
         let path = segments.join('/');
         if (!path.startsWith('/')) path = '/' + path;
         this._navigationSubject.next([newRoute, path, pushState]);
+    }
+    
+    private performNavigation(route: RouteT, path: string, pushState: boolean, modifyHistory = true) {
+        this._eventSubject.next({
+            type: 'begin',
+            route: route,
+            path: path
+        });
+        if (!route) {
+            this._outlet.innerHTML = 'Not found';
+            document.title = 'Not Found';
+        }
+        else {
+            this._outlet.innerHTML = route.template;
+            document.title = route.title || 'Untitled Page';
+        }
+        if (modifyHistory) {
+            let historyFn = (pushState ? history.pushState : history.replaceState);
+            historyFn = historyFn.bind(history);
+            historyFn({ route: route, path: path }, document.title, document.location.protocol + '//' + document.location.host + path);
+        }
+        if (pushState) window.scrollTo(0, 0);
+        this._eventSubject.next({
+            type: 'end',
+            route: route,
+            path: path
+        });
     }
     
     private findBestRoute(segments: string[]): RouteT | null {
