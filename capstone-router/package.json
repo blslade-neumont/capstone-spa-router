@@ -13,6 +13,9 @@
         "access": "public"
     },
     "scripts": {
+        "build": "bash ./scripts/build.sh",
+        "watch": "bash ./scripts/watch.sh",
+        "clean-dist": "rimraf dist",
         "lint": "bash ./scripts/lint.sh",
         "travis": "bash ./scripts/travis.sh",
         "lint-test": "tslint --project ./tsconfig.json -c tslint.json -t stylish -e \"**/*.spec.ts\"",

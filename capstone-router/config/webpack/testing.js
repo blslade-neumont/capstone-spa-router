@@ -2,7 +2,6 @@ let { ContextReplacementPlugin, DefinePlugin, optimize } = require('webpack');
 var path = require('path');
 var webpackMerge = require('webpack-merge');
 var commonConfig = require('./common');
-let clientConfig = require('./client-config');
 
 const FRONTEND_ROOT = path.resolve(__dirname, '../../');
 
@@ -17,10 +16,6 @@ var karmaConfig = {
     output: {
         path: path.join(FRONTEND_ROOT, 'www'),
     },
-    
-    plugins: [
-        new DefinePlugin(clientConfig)
-    ],
     
     module: {
         loaders: [
