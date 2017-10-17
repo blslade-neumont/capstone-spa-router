@@ -9,10 +9,6 @@ let $awesomeTypescript = {
     loader: 'awesome-typescript-loader'
 };
 
-let $raw = {
-    loader: 'raw-loader'
-};
-
 let devConfig = {
     entry: {
         'capstone-loader': './src/scripts/capstone-loader.ts',
@@ -31,8 +27,7 @@ let devConfig = {
 
     module: {
         loaders: [
-            { test: /\.ts$/, loaders: [$awesomeTypescript], exclude: /\.spec\.ts$/ },
-            { test: /\.glslx$/, loaders: [$raw] }
+            { test: /\.ts$/, loaders: [$awesomeTypescript], exclude: /\.spec\.ts$/ }
         ]
     },
 
