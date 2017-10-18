@@ -13,6 +13,7 @@
         "access": "public"
     },
     "scripts": {
+        "pre-deploy": "bash ./scripts/pre-deploy.sh",
         "build": "bash ./scripts/build.sh",
         "watch": "bash ./scripts/watch.sh",
         "clean-dist": "rimraf dist",

@@ -12,14 +12,8 @@ script:
 
 before_deploy:
   - cd capstone-router
+  - bash ./scripts/pre-deploy.sh
 deploy:
-  - provider: script
-    script: bash ./scripts/travis/deploy.sh
-    skip_cleanup: true
-    on:
-      branch: master
-      tags: true
-      repo: blslade-neumont/capstone-spa-router
   - provider: npm
     email: brandonyoyoslade@gmail.com
     api_key:
