@@ -2,6 +2,9 @@
 
 src
 node_modules
+config
+scripts
+dist/**/test/
 
 src/**/*.js
 src/**/*.js.map
@@ -10,6 +13,7 @@ npm-debug.log
 yarn-error.log
 
 tsconfig.json
+tsconfig.production.json
 yarn.lock
 .npmignore
 **/.gitignore
