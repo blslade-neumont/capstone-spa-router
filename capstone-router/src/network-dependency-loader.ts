@@ -93,6 +93,10 @@ export class NetworkDependencyLoader extends DependencyLoader {
     }
     
     async loadSchema(path: string): Promise<void> {
+        this.eventsSubject.next({
+            type: 'schema-load-begin',
+            path: path
+        });
         await this.loadContentResource(path);
         let schemaStr = (<ContentResourceT>this.resources.get(path)).content;
         let schemaObj: any;
@@ -104,27 +108,48 @@ export class NetworkDependencyLoader extends DependencyLoader {
         }
         let schemaArr: SchemaEntryT[] = schemaObj.content;
         this.addSchema(schemaArr);
+        this.eventsSubject.next({
+            type: 'schema-load-end',
+            path: path,
+            added: schemaArr
+        });
     }
     
     private async getContentImpl(name: string) {
         let meta = this.schemaMap.get(name);
         if (!meta) throw new Error(`Content ${name} is not defined in the schema`);
         
+        this.eventsSubject.next({
+            type: 'dep-load-begin',
+            name: name
+        });
+        
+        let content: any;
+        
         switch (meta.type) {
         case "text":
             await this.loadContentResource(meta.src);
-            return (<ContentResourceT>this.resources.get(meta.src)).content;
+            content = (<ContentResourceT>this.resources.get(meta.src)).content;
+            break;
             
         case "script":
             await this.executeScriptResource(meta.src);
             let deps = await Promise.all((meta.deps || []).map(this.get.bind(this)));
             let fn = this._global[meta.methodName];
             if (typeof fn !== 'function') throw new Error(`Content '${meta.name}' uses methodName ${meta.methodName}, which is not a function`);
-            return await fn(...deps);
+            content = await fn(...deps);
+            break;
             
         default:
             throw new Error(`Invalid type for content '${name}': ${(<any>meta).type}`);
         }
+        
+        this.eventsSubject.next({
+            type: 'dep-load-end',
+            name: name,
+            content: content
+        });
+        return content;
     }
     
     private contentCache = new Map<string, ContentResourceT>();

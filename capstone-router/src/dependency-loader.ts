@@ -1,7 +1,13 @@
 import { SchemaT, SchemaEntryT, SimpleContentMetaT, DynamicContentMetaT } from './schema';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import { DependencyLoaderEventT } from './events';
 
 export abstract class DependencyLoader {
     constructor() { }
+    
+    protected eventsSubject = new Subject<DependencyLoaderEventT>();
+    readonly events = this.eventsSubject.asObservable();
     
     abstract loadSchema(path: string): Promise<void>;
     
@@ -13,6 +19,10 @@ export abstract class DependencyLoader {
         for (let meta of schema) {
             this.schemaMap.set(meta.name, meta);
         }
+        this.eventsSubject.next({
+            type: 'schema-added',
+            added: schema
+        });
     }
     private validateSchema(schema: SchemaT) {
         //TODO: check entries already added to the schema map
