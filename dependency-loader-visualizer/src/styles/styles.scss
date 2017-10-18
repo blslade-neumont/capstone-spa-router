@@ -30,6 +30,13 @@ table > tbody > tr:hover > td {
 td.ref {
     width: 15%;
     padding-right: 2em;
+    
+    &.loading {
+        color: orange;
+    }
+    &.loaded {
+        color: green;
+    }
 }
 td.depsref {
     padding-right: 2em;
