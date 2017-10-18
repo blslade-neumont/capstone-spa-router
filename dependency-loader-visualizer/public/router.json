@@ -1,7 +1,37 @@
 {
     "$schema": "../node_modules/@aboveyou00/capstone-router/router-schema.json",
     "router": { },
-    "content": [
-        { "type": "text", "name": "my-name", "src": "my-source.txt" }
-    ]
+    "content": [{
+        "name": "static-text",
+        "type": "text",
+        "src": "assets/static-text.txt"
+    }, {
+        "name": "lazy1",
+        "type": "script",
+        "src": "scripts/lazy1.bundle.js",
+        "methodName": "lazy1"
+    }, {
+        "name": "lazy2",
+        "type": "script",
+        "src": "scripts/lazy2.bundle.js",
+        "methodName": "lazy2",
+        "deps": ["lazy1"]
+    }, {
+        "name": "lazy3-a",
+        "type": "script",
+        "src": "scripts/lazy3.bundle.js",
+        "methodName": "lazy3A"
+    }, {
+        "name": "lazy3-b",
+        "type": "script",
+        "src": "scripts/lazy3.bundle.js",
+        "methodName": "lazy3B",
+        "deps": ["static-text"]
+    }, {
+        "name": "lazy3-c",
+        "type": "script",
+        "src": "scripts/lazy3.bundle.js",
+        "methodName": "lazy3C",
+        "deps": ["lazy1", "lazy2", "lazy3-a", "lazy3-b"]
+    }]
 }
