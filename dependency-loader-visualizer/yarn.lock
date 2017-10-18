@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@aboveyou00/capstone-router@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@aboveyou00/capstone-router/-/capstone-router-0.0.2.tgz#bd6c266400a5ce262e89505f37ebcdfd14bab44f"
+"@aboveyou00/capstone-router@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@aboveyou00/capstone-router/-/capstone-router-0.0.3.tgz#9775620ae225e4739ec7148ba9a699228e30fb65"
   dependencies:
     "@types/core-js" "^0.9.43"
     awesome-typescript-loader "^3.2.3"

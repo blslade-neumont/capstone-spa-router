@@ -2,6 +2,6 @@
     "$schema": "../node_modules/@aboveyou00/capstone-router/router-schema.json",
     "router": { },
     "content": [
-        
+        { "type": "text", "name": "my-name", "src": "my-source.txt" }
     ]
 }
