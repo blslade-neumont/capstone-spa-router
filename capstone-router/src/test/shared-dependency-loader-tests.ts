@@ -2,6 +2,7 @@
 
 import { DependencyLoader } from '../dependency-loader';
 import { SchemaT } from '../schema';
+import { DependencyLoaderEventT } from '../events';
 
 export function sharedDependencyLoaderTests<T extends DependencyLoader>(factoryFn: () => T, cleanupFn?: (inst: T) => void) {
     describe('shared functionality', () => {
@@ -28,6 +29,14 @@ export function sharedDependencyLoaderTests<T extends DependencyLoader>(factoryF
                     src: 'blah.txt'
                 }]);
                 expect(inst.has('testKey')).toBeTruthy();
+            });
+            it(`should emit a 'schema-added' event`, () => {
+                let eventsRecieved: DependencyLoaderEventT[] = [];
+                let subscription = inst.events.subscribe(e => eventsRecieved.push(e));
+                inst.addSchema([]);
+                subscription.unsubscribe();
+                expect(eventsRecieved.length).toEqual(1);
+                expect(eventsRecieved[0].type).toBe('schema-added');
             });
         });
         

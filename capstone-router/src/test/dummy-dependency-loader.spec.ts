@@ -2,6 +2,7 @@
 
 import { DummyDependencyLoader } from '../dummy-dependency-loader';
 import { sharedDependencyLoaderTests } from './shared-dependency-loader-tests';
+import { DependencyLoaderEventT } from '../events';
 
 describe('DummyDependencyLoader', () => {
     sharedDependencyLoaderTests(() => {
@@ -40,6 +41,25 @@ describe('DummyDependencyLoader', () => {
             it('should not throw if the arguments are valid', () => {
                 inst.addSchema([{ type: 'text', name: 'name', src: 'source.txt' }]);
                 expect(() => inst.provide('name', 'value')).not.toThrowError();
+            });
+            it(`should emit a 'dep-load-begin' event`, () => {
+                inst.addSchema([{ type: 'text', name: 'name', src: 'source.txt' }]);
+                let eventsRecieved: DependencyLoaderEventT[] = [];
+                let subscription = inst.events.subscribe(e => eventsRecieved.push(e));
+                inst.provide('name', 'value');
+                subscription.unsubscribe();
+                expect(eventsRecieved[0].type).toBe('dep-load-begin');
+                expect((<any>eventsRecieved[0]).name).toBe('name');
+            });
+            it(`should emit a 'dep-load-end' event`, () => {
+                inst.addSchema([{ type: 'text', name: 'name', src: 'source.txt' }]);
+                let eventsRecieved: DependencyLoaderEventT[] = [];
+                let subscription = inst.events.subscribe(e => eventsRecieved.push(e));
+                inst.provide('name', 'value');
+                subscription.unsubscribe();
+                expect(eventsRecieved[1].type).toBe('dep-load-end');
+                expect((<any>eventsRecieved[1]).name).toBe('name');
+                expect((<any>eventsRecieved[1]).content).toBe('value');
             });
         });
         
