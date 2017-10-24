@@ -1,5 +1,5 @@
 import { DependencyLoader } from './dependency-loader';
-import { SchemaEntryT } from '../shared/schema';
+import { SchemaEntryT } from './schema';
 
 interface BaseResourceT {
     isLoaded: boolean;

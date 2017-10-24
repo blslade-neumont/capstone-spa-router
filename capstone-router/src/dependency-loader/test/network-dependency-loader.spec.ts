@@ -4,7 +4,7 @@ import { NetworkDependencyLoader } from '../network-dependency-loader';
 import { sharedDependencyLoaderTests } from './shared-dependency-loader-tests';
 import { delay } from '../../util/delay';
 import { SchemaT, SimpleContentMetaT, DynamicContentMetaT } from '../schema';
-import { DependencyLoaderEventT } from '../../shared/events';
+import { DependencyLoaderEventT } from '../events';
 
 describe('NetworkDependencyLoader', () => {
     sharedDependencyLoaderTests(() => {

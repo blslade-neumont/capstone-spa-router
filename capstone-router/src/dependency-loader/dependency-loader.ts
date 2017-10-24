@@ -1,7 +1,7 @@
-import { SchemaT, SchemaEntryT, SimpleContentMetaT, DynamicContentMetaT } from './schema';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { DependencyLoaderEventT } from '../shared/events';
+import { SchemaT, SchemaEntryT, SimpleContentMetaT, DynamicContentMetaT } from './schema';
+import { DependencyLoaderEventT } from './events';
 
 export abstract class DependencyLoader {
     constructor() { }

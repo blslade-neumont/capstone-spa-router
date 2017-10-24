@@ -3,10 +3,6 @@
     "title": "Router",
     "type": "object",
     "properties": {
-        "router": {
-            "type": "object",
-            "oneOf": [{ "$ref": "#/definitions/router" }]
-        },
         "content": {
             "type": "array",
             "items": {
@@ -19,9 +15,6 @@
     },
     "required": ["router"],
     "definitions": {
-        "router": {
-            
-        },
         "content": {
             "properties": {
                 "name": {
