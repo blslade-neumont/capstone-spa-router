@@ -1,0 +1,28 @@
+{
+    "$schema": "../node_modules/@aboveyou00/capstone-router/schema/dependencies.json",
+    "content": [{
+        "name": "routes",
+        "type": "text",
+        "src": "routes.json"
+    }, {
+        "name": "home-tpl",
+        "type": "text",
+        "src": "templates/home.tpl.html"
+    }, {
+        "name": "about-tpl",
+        "type": "text",
+        "src": "templates/about.tpl.html"
+    }, {
+        "name": "page1-tpl",
+        "type": "text",
+        "src": "templates/page1.tpl.html"
+    }, {
+        "name": "page2-tpl",
+        "type": "text",
+        "src": "templates/page2.tpl.html"
+    }, {
+        "name": "page3-tpl",
+        "type": "text",
+        "src": "templates/page3.tpl.html"
+    }]
+}
