@@ -2,7 +2,7 @@
 
 import { DummyDependencyLoader } from '../dummy-dependency-loader';
 import { sharedDependencyLoaderTests } from './shared-dependency-loader-tests';
-import { DependencyLoaderEventT } from '../events';
+import { DependencyLoaderEventT } from '../../shared/events';
 
 describe('DummyDependencyLoader', () => {
     sharedDependencyLoaderTests(() => {

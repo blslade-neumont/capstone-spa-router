@@ -1,9 +1,6 @@
 
 
-export * from './schema';
-export * from './events';
+export * from './shared';
 
 export * from './dependency-loader';
-
-export * from './dummy-dependency-loader';
-export * from './network-dependency-loader';
+export * from './router';

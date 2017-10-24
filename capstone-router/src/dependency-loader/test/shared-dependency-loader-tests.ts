@@ -1,8 +1,8 @@
 /// <reference types="jasmine" />
 
 import { DependencyLoader } from '../dependency-loader';
-import { SchemaT } from '../schema';
-import { DependencyLoaderEventT } from '../events';
+import { SchemaT } from '../../shared/schema';
+import { DependencyLoaderEventT } from '../../shared/events';
 
 export function sharedDependencyLoaderTests<T extends DependencyLoader>(factoryFn: () => T, cleanupFn?: (inst: T) => void) {
     describe('shared functionality', () => {

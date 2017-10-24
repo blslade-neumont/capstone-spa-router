@@ -1,5 +1,5 @@
 import { DependencyLoader } from './dependency-loader';
-import { delay } from './util/delay';
+import { delay } from '../util/delay';
 
 export class DummyDependencyLoader extends DependencyLoader {
     constructor(private delay: number = 0) {
