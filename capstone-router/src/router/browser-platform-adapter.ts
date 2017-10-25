@@ -32,7 +32,8 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
     private router: Router;
     private eventsSubject: Subject<RouterEventT>;
     async initRouter(router: Router, eventsSubject: Subject<RouterEventT>) {
-        if (this.router) throw new Error(`Can't init BrowserPlatformAdapter with a new router.`);
+        if (this.router) throw new Error(`Can't init BrowserPlatformAdapter that has already been initialized.`);
+        if (!router) throw new Error(`Can't init BrowserPlatformAdapter without a router.`);
         this.router = router;
         this.eventsSubject = eventsSubject;
         this.initOutlet();

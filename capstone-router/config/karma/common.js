@@ -37,6 +37,7 @@ module.exports = {
         // Polyfills
         './node_modules/promise-polyfill/promise.js',
         './node_modules/map-polyfill/dist/map.min.js',
+        './node_modules/string.prototype.startswith/startswith.js',
         
         // Spec tests.
         './src/**/*.spec.ts'
