@@ -7,17 +7,24 @@ import { RouterEventT } from './events';
 export class BrowserPlatformAdapter extends PlatformAdapter {
     constructor() {
         super();
+        this._document = document;
+        this._window = window;
+        this._history = history;
     }
     
+    private _document: Document;
+    private _window: Window;
+    private _history: History;
+    
     runOnInit(act: () => void) {
-        switch (document.readyState) {
+        switch (this._document.readyState) {
         case 'interactive':
         case 'complete':
             act();
             break;
         case 'loading':
         default:
-            document.addEventListener('DOMContentLoaded', () => act());
+            this._document.addEventListener('DOMContentLoaded', () => act());
             break;
         }
     }
@@ -33,21 +40,22 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
         this.initHistory();
     }
     private initOutlet() {
-        this._outlet = document.createElement('div');
-        let routerOutlet = document.getElementsByTagName('router-outlet')[0];
+        this._outlet = this._document.createElement('div');
+        let routerOutlet = this._document.getElementsByTagName('router-outlet')[0];
         if (routerOutlet) {
             routerOutlet.parentElement.insertBefore(this._outlet, routerOutlet);
             routerOutlet.parentElement.removeChild(routerOutlet);
         }
         else {
-            document.body.appendChild(this._outlet);
+            this._document.body.appendChild(this._outlet);
         }
     }
     private initDOM() {
-        document.addEventListener('click', e => {
+        this._document.addEventListener('click', e => {
             if (e.target instanceof HTMLAnchorElement) {
                 let href: string | null = e.target.href;
-                href = this.resolveLocalHref(document.location.protocol + '//' + document.location.host, document.location.pathname, href);
+                let location = this._document.location;
+                href = this.resolveLocalHref(location.protocol + '//' + location.host, location.pathname, href);
                 if (href) {
                     e.preventDefault();
                     this.router.navigateTo(href);
@@ -56,7 +64,7 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
         });
     }
     private initHistory() {
-        window.addEventListener('popstate', e => {
+        this._window.addEventListener('popstate', e => {
             let { route, path } = e.state;
             this.performNavigation(route, path, false, false);
         });
@@ -81,13 +89,14 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
         
         if (route.length !== 1) throw new Error(`Not implemented: nested routes`);
         this._outlet.innerHTML = tpl[0];
-        document.title = title;
+        this._document.title = title;
         if (modifyHistory) {
-            let historyFn = (pushState ? history.pushState : history.replaceState);
-            historyFn = historyFn.bind(history);
-            historyFn({ route: route, path: path }, document.title, document.location.protocol + '//' + document.location.host + path);
+            let historyFn = this._history[pushState ? 'pushState' : 'replaceState'];
+            historyFn = historyFn.bind(this._history);
+            let location = this._document.location;
+            historyFn({ route: route, path: path }, this._document.title, location.protocol + '//' + location.host + path);
         }
-        if (pushState) window.scrollTo(0, 0);
+        if (pushState) this._window.scrollTo(0, 0);
         this.eventsSubject.next({
             type: 'end',
             route: route,
