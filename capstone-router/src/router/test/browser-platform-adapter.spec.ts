@@ -118,34 +118,79 @@ describe('BrowserPlatformAdapter', () => {
             });
             
             describe('hyperlink navigation', () => {
-                xit('should begin intercepting click events on the document', () => {
-                    
+                it('should begin intercepting click events on the document', async () => {
+                    spyOn(_document, 'addEventListener').and.callThrough();
+                    await inst.initRouter(router, eventsSubject);
+                    expect(_document.addEventListener).toHaveBeenCalledWith('click', jasmine.anything());
                 });
-                describe('when the click event is on an anchor element with a relative href', () => {
-                    xit('should prevent default behavior', () => {
-                        
+                describe('when the click event is on an anchor element with a remote href', () => {
+                    let anchor: HTMLAnchorElement;
+                    let e: MouseEvent;
+                    beforeEach(() => {
+                        anchor = document.createElement('a');
+                        anchor.href = 'http://www.google.com/';
+                        (<any>_document).location = { protocol: 'http:', host: 'localhost:8080', pathname: '/' };
+                        e = <any>{ target: anchor, preventDefault: () => void(0) };
                     });
-                    xit('should invoke router.navigateTo with the local href', () => {
-                        
+                    
+                    it('should not prevent default behavior', async () => {
+                        await inst.initRouter(router, eventsSubject);
+                        spyOn(e, 'preventDefault').and.callThrough();
+                        (<any>_document).emitEvent('click', e);
+                        expect(e.preventDefault).not.toHaveBeenCalled();
                     });
-                    xit('should push a state to the back stack', () => {
-                        
+                    it('should not invoke router.navigateTo with the local href', async () => {
+                        await inst.initRouter(router, eventsSubject);
+                        spyOn(router, 'navigateTo').and.callThrough();
+                        (<any>_document).emitEvent('click', e);
+                        expect(router.navigateTo).not.toHaveBeenCalled();
+                    });
+                });
+                describe('when the click event is on an anchor element with a local href', () => {
+                    let anchor: HTMLAnchorElement;
+                    let e: MouseEvent;
+                    beforeEach(() => {
+                        anchor = document.createElement('a');
+                        anchor.href = 'http://localhost:8080/one/two';
+                        (<any>_document).location = { protocol: 'http:', host: 'localhost:8080', pathname: '/' };
+                        e = <any>{ target: anchor, preventDefault: () => void(0) };
+                    });
+                    
+                    it('should prevent default behavior', async () => {
+                        await inst.initRouter(router, eventsSubject);
+                        spyOn(e, 'preventDefault').and.callThrough();
+                        (<any>_document).emitEvent('click', e);
+                        expect(e.preventDefault).toHaveBeenCalled();
+                    });
+                    it('should invoke router.navigateTo with the local href', async () => {
+                        await inst.initRouter(router, eventsSubject);
+                        spyOn(router, 'navigateTo').and.callThrough();
+                        (<any>_document).emitEvent('click', e);
+                        expect(router.navigateTo).toHaveBeenCalledWith('/one/two');
                     });
                 });
             });
             
             describe('browser history navigation', () => {
-                xit(`should begin intercepting 'popstate' events`, () => {
-                    
+                it(`should begin intercepting 'popstate' events`, async () => {
+                    spyOn(_window, 'addEventListener').and.callThrough();
+                    await inst.initRouter(router, eventsSubject);
+                    expect(_window.addEventListener).toHaveBeenCalledWith('popstate', jasmine.anything());
                 });
-                xit('should ignore the event if the state is not an object', () => {
-                    
+                it('should ignore the event if the state is not an object', async () => {
+                    let e: PopStateEvent = <any>{ state: null };
+                    await inst.initRouter(router, eventsSubject);
+                    spyOn(inst, 'performNavigation');
+                    (<any>_window).emitEvent('popstate', e);
+                    expect(inst.performNavigation).not.toHaveBeenCalled();
                 });
-                xit('should perform navigation with the specified route and path', () => {
-                    
-                });
-                xit('should not modify the history when performing navigation', () => {
-                    
+                it('should perform navigation with the specified route and path', async () => {
+                    let route = ['my-route'], path = 'my-path';
+                    let e: PopStateEvent = <any>{ state: { route: route, path: path } };
+                    await inst.initRouter(router, eventsSubject);
+                    spyOn(inst, 'performNavigation');
+                    (<any>_window).emitEvent('popstate', e);
+                    expect(inst.performNavigation).toHaveBeenCalledWith(route, path, false, false);
                 });
             });
         });
