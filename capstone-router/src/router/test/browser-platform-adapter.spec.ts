@@ -12,6 +12,7 @@ import { createMockHistory } from './mock-history';
 import { createMockRouter } from './mock-router';
 import { RouterEventT } from '../events';
 import { Router } from '../router';
+import { delay } from '../../util/delay';
 
 describe('BrowserPlatformAdapter', () => {
     sharedPlatformAdapterTests(() => {
@@ -196,43 +197,114 @@ describe('BrowserPlatformAdapter', () => {
         });
         
         describe('.performNavigation', () => {
-            xit('should invoke router.loadRouteTemplates', () => {
-                
+            let eventsSubject: Subject<RouterEventT>;
+            let eventsObservable: Observable<RouterEventT>;
+            let subscription: Subscription | null;
+            beforeEach(async () => {
+                eventsSubject = new Subject<any>();
+                eventsObservable = eventsSubject.asObservable();
+                subscription = null;
+                await inst.initRouter(router, eventsSubject);
             });
-            xit('should send a navigation begin event', () => {
-                
+            afterEach(() => {
+                if (subscription) {
+                    subscription.unsubscribe();
+                    subscription = null;
+                }
+            });
+            
+            it('should invoke router.loadRouteTemplates', async () => {
+                spyOn(router, 'loadRouteTemplates').and.callThrough();
+                let route = [];
+                let path = '/';
+                await inst.performNavigation(route, path, true, false);
+                expect(router.loadRouteTemplates).toHaveBeenCalledWith(route, path);
+            });
+            it('should send a navigation begin event', async () => {
+                let events: RouterEventT[] = [];
+                eventsObservable.subscribe(e => events.push(e));
+                let route = <any>['fish', 'one'];
+                let path = '/';
+                await inst.performNavigation(route, path, true, false);
+                expect(events.length).toBe(2);
+                expect(events[0].type).toBe('begin');
+                expect(events[0].route).toBe(route);
+                expect(events[0].path).toBe(path);
             });
             
             describe('when a new navigation is triggered before router.loadRouteTemplates completes', () => {
-                xit('should cancel navigation', () => {
-                    
+                beforeEach(() => {
+                    spyOn(router, 'loadRouteTemplates').and.callFake(async () => {
+                        (<any>inst).navIdx++;
+                        return delay(10).then(() => [['tpl'], 'title']);
+                    });
                 });
-                xit('should not send a navigation end event', () => {
-                    
+                
+                it('should cancel navigation', async () => {
+                    await inst.performNavigation([], '', true, false);
+                    expect((<any>inst)._outlet.innerHTML).not.toBe('tpl');
+                    expect(_document.title).not.toBe('title');
+                });
+                it('should not send a navigation end event', async () => {
+                    let events: RouterEventT[] = [];
+                    eventsObservable.subscribe(e => events.push(e));
+                    await inst.performNavigation([], '', true, false);
+                    expect(events.length).toBe(1);
                 });
             });
             
-            describe('when navigation is not interrupted', () => {
-                xit(`should set the outlet's innerHTML with the loaded route template`, () => {
-                    
+            describe('when navigation is not interrupted', async () => {
+                it(`should set the outlet's innerHTML with the loaded route template`, async () => {
+                    await inst.performNavigation([], '', true, false);
+                    expect((<any>inst)._outlet.innerHTML).toBe('tpl');
                 });
-                xit(`should set the document's title with the loaded route title`, () => {
-                    
+                it(`should set the document's title with the loaded route title`, async () => {
+                    await inst.performNavigation([], '', true, false);
+                    expect(_document.title).toBe('title');
                 });
-                xit(`should call history.pushState if pushState is true`, () => {
-                    
+                it(`should call history.pushState if pushState is true`, async () => {
+                    spyOn(_history, 'pushState');
+                    (<any>_document).location = { protocol: 'http:', host: 'localhost:8080', pathname: '/' };
+                    let route = <any[]>['orange goldfish!'];
+                    let path = 'fishies!';
+                    await inst.performNavigation(route, path, true);
+                    expect(_history.pushState).toHaveBeenCalledWith({ route: route, path: path }, 'title', jasmine.anything());
                 });
-                xit(`should call history.replaceState if pushState is false`, () => {
-                    
+                it(`should call history.replaceState if pushState is false`, async () => {
+                    spyOn(_history, 'replaceState');
+                    (<any>_document).location = { protocol: 'http:', host: 'localhost:8080', pathname: '/' };
+                    let route = <any[]>['orange goldfish!'];
+                    let path = 'fishies!';
+                    await inst.performNavigation(route, path, false);
+                    expect(_history.replaceState).toHaveBeenCalledWith({ route: route, path: path }, 'title', jasmine.anything());
                 });
-                xit(`should not push or replace state if modifyHistory is false`, () => {
-                    
+                it(`should not push or replace state if modifyHistory is false`, async () => {
+                    spyOn(_history, 'pushState');
+                    spyOn(_history, 'replaceState');
+                    await inst.performNavigation([], '', true, false);
+                    expect(_history.pushState).not.toHaveBeenCalled();
+                    expect(_history.replaceState).not.toHaveBeenCalled();
                 });
-                xit(`should scroll to the beginning of the document`, () => {
-                    
+                it(`should scroll to the beginning of the document if pushState is true`, async () => {
+                    spyOn(_window, 'scrollTo');
+                    await inst.performNavigation([], '', true, false);
+                    expect(_window.scrollTo).toHaveBeenCalledWith(0, 0);
                 });
-                xit('should send a navigation end event', () => {
-                    
+                it(`should not scroll to the beginning of the document if pushState is false`, async () => {
+                    spyOn(_window, 'scrollTo');
+                    await inst.performNavigation([], '', false, false);
+                    expect(_window.scrollTo).not.toHaveBeenCalled();
+                });
+                it('should send a navigation end event', async () => {
+                    let events: RouterEventT[] = [];
+                    eventsObservable.subscribe(e => events.push(e));
+                    let route = <any>['fish', 'one'];
+                    let path = '/';
+                    await inst.performNavigation(route, path, true, false);
+                    expect(events.length).toBe(2);
+                    expect(events[1].type).toBe('end');
+                    expect(events[1].route).toBe(route);
+                    expect(events[1].path).toBe(path);
                 });
             });
         });

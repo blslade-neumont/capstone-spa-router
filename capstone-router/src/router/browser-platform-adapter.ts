@@ -89,7 +89,7 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
         
         if (currentNavIdx !== this.navIdx) return;
         
-        if (route.length !== 1) throw new Error(`Not implemented: nested routes`);
+        if (tpl.length !== 1) throw new Error(`Not implemented: nested routes`);
         this._outlet.innerHTML = tpl[0];
         this._document.title = title;
         if (modifyHistory) {
