@@ -50,7 +50,7 @@ export class Router {
         this._navigationObservable.subscribe(([route, path, pushState]) => {
             this.platform.performNavigation(route, path, pushState);
         });
-        this.navigateTo(document.location.pathname, true, true);
+        this.navigateTo(document.location.pathname, false, true);
     }
     
     get dependencyLoader() {

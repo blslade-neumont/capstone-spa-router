@@ -65,6 +65,7 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
     }
     private initHistory() {
         this._window.addEventListener('popstate', e => {
+            if (!e.state || typeof e.state !== 'object') return;
             let { route, path } = e.state;
             this.performNavigation(route, path, false, false);
         });
