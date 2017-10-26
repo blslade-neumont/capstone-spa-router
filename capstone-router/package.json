@@ -1,6 +1,6 @@
 {
     "name": "@aboveyou00/capstone-router",
-    "version": "0.0.4",
+    "version": "0.1.0",
     "description": "Capstone project for Brandon Slade - router NPM package",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
