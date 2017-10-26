@@ -16,7 +16,7 @@ export class Router {
     ) {
         this._navigationObservable = this._navigationSubject
             .asObservable()
-            .distinctUntilChanged((lhs, rhs) => lhs[0] === rhs[0]);
+            .distinctUntilChanged((lhs, rhs) => this.areSameNavigation(lhs, rhs));
         this._currentRoute = this._navigationObservable
             .map(([route]) => route);
         
@@ -140,6 +140,19 @@ export class Router {
         let path = segments.join('/');
         if (!path.startsWith('/')) path = '/' + path;
         this._navigationSubject.next([newRoute, path, pushState]);
+    }
+    private areSameNavigation(lhs: [RouteEntryT[] | null, string, boolean], rhs: [RouteEntryT[] | null, string, boolean]) {
+        let leftRoutes = lhs[0];
+        let rightRoutes = rhs[0];
+        if (!leftRoutes || !rightRoutes) {
+            if (!leftRoutes && !rightRoutes) return lhs[1] === rhs[1];
+            return false;
+        }
+        if (leftRoutes.length !== rightRoutes.length) return false;
+        for (let q = 0; q < leftRoutes.length; q++) {
+            if (leftRoutes[q] !== rightRoutes[q]) return false;
+        }
+        return true;
     }
     
     async loadRouteTemplates(route: RouteEntryT[], path: string): Promise<[string[], string]> {
