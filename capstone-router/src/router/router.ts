@@ -155,7 +155,7 @@ export class Router {
         return true;
     }
     
-    async loadRouteTemplates(route: RouteEntryT[], path: string): Promise<[string[], string]> {
+    async loadRouteTemplates(route: RouteEntryT[] | null, path: string): Promise<[string[], string]> {
         let tpl: string[];
         let title: string;
         if (!route) {

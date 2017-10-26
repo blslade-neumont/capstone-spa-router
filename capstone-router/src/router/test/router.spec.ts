@@ -1,7 +1,6 @@
 /// <reference types="jasmine" />
 
 import { Router } from '../router';
-import { DependencyLoader } from '../../dependency-loader/dependency-loader';
 import { DummyDependencyLoader } from '../../dependency-loader/dummy-dependency-loader';
 import { BrowserPlatformAdapter } from '../browser-platform-adapter';
 import { createMockDocument } from './mock-document';
@@ -12,7 +11,7 @@ import { delay } from '../../util/delay';
 
 describe('Router', () => {
     let inst: Router;
-    let deps: DependencyLoader;
+    let deps: DummyDependencyLoader;
     let platformAdapter: BrowserPlatformAdapter;
     let _document: Document;
     let _window: Window;
@@ -282,58 +281,162 @@ describe('Router', () => {
         });
         
         describe('when the route is null', () => {
-            xit(`should return 'Not found' for the title and template`, async () => {
-                
+            it(`should return 'Not found' for the title and template`, async () => {
+                let [tpl, title] = await inst.loadRouteTemplates(null, '/a/b/c');
+                expect(tpl).toEqual(['Not found']);
+                expect(title).toBe('Not Found');
             });
         });
         
         describe('when the route is not null', () => {
-            xit('should load all route segment templates through the dependency loader', async () => {
-                
+            it('should load all route segment templates through the dependency loader', async () => {
+                deps.addSchema([
+                    { name: 'tpl-one', src: 'one.tpl.html', type: 'text' },
+                    { name: 'tpl-two', src: 'two.tpl.html', type: 'text' },
+                    { name: 'tpl-three', src: 'three.tpl.html', type: 'text' }
+                ]);
+                deps.provide('tpl-one', 'One!');
+                deps.provide('tpl-two', 'Two!');
+                deps.provide('tpl-three', 'Three!');
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: 'one', template: { dep: 'tpl-one' } },
+                    { path: 'two', template: { dep: 'tpl-two' } },
+                    { path: 'three', template: { dep: 'tpl-three' }, title: 'Title!' }
+                ], '/a/b/c');
+                expect(tpl).toEqual(['One!', 'Two!', 'Three!']);
             });
-            xit('should allow inline templates', async () => {
-                
+            it('should allow inline templates', async () => {
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: 'one', template: 'One!!!' }
+                ], '/a/b/c');
+                expect(tpl).toEqual(['One!!!']);
             });
-            xit('should allow dependency-loaded templates', async () => {
-                
+            it('should allow dependency-loaded templates', async () => {
+                deps.addSchema([{ name: 'tpl-one', src: 'one.tpl.html', type: 'text' }]);
+                deps.provide('tpl-one', 'One!');
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: 'one', template: { dep: 'tpl-one' } }
+                ], '/a/b/c');
+                expect(tpl).toEqual(['One!']);
             });
-            xit('should allow dependency-loaded template factories', async () => {
-                
+            it('should allow dependency-loaded template factories', async () => {
+                deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
+                deps.provide('tpl-one', (path: string) => `((${path}))`);
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: 'one', template: { factory: 'tpl-one' } }
+                ], '/a/b/c');
+                expect(tpl).toEqual(['((/a/b/c))']);
             });
-            xit('should fail if a template factory dependency is not a function', async () => {
-                
+            it('should fail if a template factory dependency is not a function', async () => {
+                deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
+                deps.provide('tpl-one', 'One!!!');
+                try {
+                    await inst.loadRouteTemplates([
+                        { path: 'one', template: { factory: 'tpl-one' } }
+                    ], '/a/b/c');
+                }
+                catch (e) {
+                    expect(e.message).toMatch(/must be a function/i);
+                    return;
+                }
+                expect(true).toBeFalsy();
             });
-            xit('should fail if a template is not a valid template reference', async () => {
-                
+            it('should fail if a template is not a valid template reference', async () => {
+                try {
+                    await inst.loadRouteTemplates([
+                        { path: 'one', template: <any>{ purple: 'tpl-one' } }
+                    ], '/a/b/c');
+                }
+                catch (e) {
+                    expect(e.message).toMatch(/invalid template parameter/i);
+                    return;
+                }
+                expect(true).toBeFalsy();
             });
-            xit('should allow template factories to return promises', async () => {
-                
+            it('should allow template factories to return promises', async () => {
+                deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
+                deps.provide('tpl-one', (path: string) => delay(10).then(() => `((${path}))`));
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: 'one', template: { factory: 'tpl-one' } }
+                ], '/a/b/c');
+                expect(tpl).toEqual(['((/a/b/c))']);
             });
-            xit('should fail if the template does not resolve to be a string', async () => {
-                
+            it('should fail if the template does not resolve to be a string', async () => {
+                deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
+                deps.provide('tpl-one', 42);
+                try {
+                    await inst.loadRouteTemplates([
+                        { path: 'one', template: { dep: 'tpl-one' } }
+                    ], '/a/b/c');
+                }
+                catch (e) {
+                    expect(e.message).toMatch(/must be a string/i);
+                    return;
+                }
+                expect(true).toBeFalsy();
             });
-            xit(`should return 'Untitled Page' as the title if none of the routes specify a title`, async () => {
-                
+            it(`should return 'Untitled Page' as the title if none of the routes specify a title`, async () => {
+                deps.addSchema([
+                    { name: 'tpl-one', src: 'one.tpl.html', type: 'text' },
+                    { name: 'tpl-two', src: 'two.tpl.html', type: 'text' },
+                    { name: 'tpl-three', src: 'three.tpl.html', type: 'text' }
+                ]);
+                deps.provide('tpl-one', 'One!');
+                deps.provide('tpl-two', 'Two!');
+                deps.provide('tpl-three', 'Three!');
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: 'one', template: { dep: 'tpl-one' } },
+                    { path: 'two', template: { dep: 'tpl-two' } },
+                    { path: 'three', template: { dep: 'tpl-three' } }
+                ], '/a/b/c');
+                expect(title).toEqual('Untitled Page');
             });
-            xit(`should return the title of the most granular route segment that specifies a title`, async () => {
-                
+            it(`should return the title of the most granular route segment that specifies a title`, async () => {
+                deps.addSchema([
+                    { name: 'tpl-one', src: 'one.tpl.html', type: 'text' },
+                    { name: 'tpl-two', src: 'two.tpl.html', type: 'text' },
+                    { name: 'tpl-three', src: 'three.tpl.html', type: 'text' }
+                ]);
+                deps.provide('tpl-one', 'One!');
+                deps.provide('tpl-two', 'Two!');
+                deps.provide('tpl-three', 'Three!');
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: 'one', template: { dep: 'tpl-one' }, title: 'Title-One!' },
+                    { path: 'two', template: { dep: 'tpl-two' }, title: 'Title-Two!' },
+                    { path: 'three', template: { dep: 'tpl-three' } }
+                ], '/a/b/c');
+                expect(title).toEqual('Title-Two!');
             });
         });
     });
     
     describe('.findBestRoute', () => {
+        let fn: (segments: string[]) => Promise<any[] | null>;
         beforeEach(() => {
             (<any>_document).emitEvent('DOMContentLoaded', {});
+            fn = (<any>inst).findBestRoute.bind(inst);
         });
         
-        xit('should fail if no routes have been loaded', async () => {
-            
+        it('should fail if no routes have been loaded', async () => {
+            try {
+                await fn(['/']);
+            }
+            catch (e) {
+                expect(e.message).toMatch(/no routes.* loaded/i);
+                return;
+            }
+            expect(true).toBeFalsy();
         });
-        xit('should return the first route that matches the path segments', async () => {
-            
+        it('should return the first route that matches the path segments', async () => {
+            let single = cloneDeep(singleRoute)[0];
+            await inst.loadRoutes([single, cloneDeep(single)]);
+            let result = await fn(['/']);
+            expect(result).toEqual([single]);
         });
-        xit('should return null if no route matches the path segments', async () => {
-            
+        it('should return null if no route matches the path segments', async () => {
+            await inst.loadRoutes(cloneDeep(tripleRoutes));
+            let result = await fn(['/fish/kisses']);
+            expect(result).toEqual(null);
         });
     });
 });
