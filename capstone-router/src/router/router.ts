@@ -114,7 +114,6 @@ export class Router {
         }
         if (route.children) {
             this.validateRoutes(route.children);
-            throw new Error(`Route children not implemented`);
         }
     }
     async getRoutes(awaitRoutes = false): Promise<RouteEntryT[]> {
