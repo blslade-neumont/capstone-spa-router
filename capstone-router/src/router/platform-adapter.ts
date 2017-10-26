@@ -10,5 +10,6 @@ export abstract class PlatformAdapter {
     
     abstract initRouter(router: Router, eventsSubject: Subject<RouterEventT>): Promise<void>;
     
+    readonly location;
     abstract performNavigation(route: RouteEntryT[], path: string, pushState: boolean, modifyHistory?: boolean);
 }

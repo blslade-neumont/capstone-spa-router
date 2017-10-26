@@ -72,6 +72,10 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
         });
     }
     
+    get location() {
+        return this._document.location;
+    }
+    
     private _outlet: HTMLElement;
     private navIdx = 0;
     

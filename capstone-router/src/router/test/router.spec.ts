@@ -7,6 +7,7 @@ import { BrowserPlatformAdapter } from '../browser-platform-adapter';
 import { createMockDocument } from './mock-document';
 import { createMockWindow } from './mock-window';
 import { createMockHistory } from './mock-history';
+import cloneDeep = require('lodash.clonedeep');
 
 describe('Router', () => {
     let inst: Router;
@@ -18,96 +19,180 @@ describe('Router', () => {
     beforeEach(() => {
         deps = new DummyDependencyLoader();
         platformAdapter = new BrowserPlatformAdapter();
-        _document = (<any>inst)._document = createMockDocument();
-        _window = (<any>inst)._window = createMockWindow();
-        _history = (<any>inst)._history = createMockHistory();
+        _document = (<any>platformAdapter)._document = createMockDocument();
+        (<any>_document).readyState = 'loading';
+        (<any>_document).location = { protocol: 'http:', host: 'localhost:8080', pathname: '/a/b/c' };
+        _window = (<any>platformAdapter)._window = createMockWindow();
+        _history = (<any>platformAdapter)._history = createMockHistory();
         inst = new Router(deps, platformAdapter);
     });
     
     describe('.ensureInitialized', () => {
-        xit('should return a promise', () => {
-            
+        it('should return a promise', () => {
+            let result = inst.ensureInitialized();
+            expect(result instanceof Promise).toBe(true);
         });
         describe('that promise', () => {
-            xit('should be resolved when the router is done initializing', async () => {
-                
+            it('should be resolved when the router is done initializing', async () => {
+                let manuallyInitialized = false;
+                let otherThread = (async () => {
+                    await inst.ensureInitialized();
+                    expect(manuallyInitialized).toBe(true);
+                })();
+                manuallyInitialized = true;
+                (<any>_document).emitEvent('DOMContentLoaded', {});
+                await otherThread;
             });
         });
     });
     
     describe('.init', () => {
-        xit('should initialize the platform adapter', async () => {
-            
+        it('should initialize the platform adapter', async () => {
+            spyOn(platformAdapter, 'initRouter');
+            (<any>_document).emitEvent('DOMContentLoaded', {});
+            await inst.ensureInitialized();
+            expect(platformAdapter.initRouter).toHaveBeenCalledWith(inst, jasmine.anything());
         });
-        xit('should begin navigating to the current location pathname', async () => {
-            
+        it('should begin navigating to the current location pathname', async () => {
+            spyOn(inst, 'navigateTo');
+            (<any>_document).emitEvent('DOMContentLoaded', {});
+            await inst.ensureInitialized();
+            expect(inst.navigateTo).toHaveBeenCalledWith('/a/b/c', false, true);
         });
     });
     
+    const singleRoute = [{ path: '/', template: 'tpl', title: 'title' }];
+    const singleRouteDep = JSON.stringify({ routes: singleRoute });
+    
+    const tripleRoutes = [
+        { path: '/', template: 'Homepage!', title: 'Home' },
+        { path: '/about', template: 'About!', title: 'About' },
+        { path: '/contact-us', template: 'Contact us!', title: 'Contact Us' }
+    ];
+    
     describe('.loadRoutes', () => {
-        xit('should not allow users to load more than one set of routes', async () => {
-            
+        it('should not allow users to load more than one set of routes', async () => {
+            (<any>_document).emitEvent('DOMContentLoaded', {});
+            inst.loadRoutes(cloneDeep(singleRoute));
+            try {
+                await inst.loadRoutes(cloneDeep(singleRoute));
+            }
+            catch (e) {
+                expect(e.message).toMatch(/only one set of routes/i);
+                return;
+            }
+            expect(true).toBeFalsy();
         });
-        xit('should fetch the routes using the dependency loader if routes is a string', async () => {
-            
+        it('should fetch the routes using the dependency loader if routes is a string', async () => {
+            (<any>_document).emitEvent('DOMContentLoaded', {});
+            spyOn(deps, 'get').and.callFake(() => Promise.resolve(singleRouteDep));
+            await inst.loadRoutes('routes');
+            expect(deps.get).toHaveBeenCalledWith('routes');
         });
-        xit('should invoke validateRoutes on the routes passed in or fetched', async () => {
-            
+        it('should invoke validateRoutes on the routes passed in or fetched', async () => {
+            (<any>_document).emitEvent('DOMContentLoaded', {});
+            spyOn((<any>inst), 'validateRoutes');
+            let routes = cloneDeep(singleRoute);
+            await inst.loadRoutes(routes);
+            expect((<any>inst).validateRoutes).toHaveBeenCalledWith(routes);
         });
-        xit('should not resolve until after the router is initialized', async () => {
-            
+        it('should not resolve until after the router is initialized', async () => {
+            let manuallyInitialized = false;
+            let otherThread = (async () => {
+                await inst.loadRoutes(cloneDeep(singleRoute));
+                expect(manuallyInitialized).toBe(true);
+            })();
+            manuallyInitialized = true;
+            (<any>_document).emitEvent('DOMContentLoaded', {});
+            await otherThread;
         });
     });
     
     describe('.validateRoutes', () => {
-        xit('should fail if routes is is null or falsey', () => {
-            
+        it('should fail if routes is is null or falsey', () => {
+            expect(() => (<any>inst).validateRoutes(null)).toThrowError(/routes is falsey/i);
+            expect(() => (<any>inst).validateRoutes()).toThrowError(/routes is falsey/i);
         });
-        xit('should fail if routes is not an array', () => {
-            
+        it('should fail if routes is not an array', () => {
+            expect(() => (<any>inst).validateRoutes({})).toThrowError(/routes is not an array/i);
+            expect(() => (<any>inst).validateRoutes(42)).toThrowError(/routes is not an array/i);
         });
-        xit('should invoke validateRoute on each route', () => {
-            
+        it('should invoke validateRoute on each route', () => {
+            spyOn(<any>inst, 'validateRoute');
+            (<any>inst).validateRoutes(cloneDeep(tripleRoutes));
+            expect((<any>inst).validateRoute).toHaveBeenCalledTimes(tripleRoutes.length);
         });
-        xit('should fail if the routes tree structure is recursive', () => {
-            
+        it('should fail if the routes tree structure is recursive', () => {
+            let recursiveRoute = cloneDeep(singleRoute);
+            recursiveRoute[0].children = recursiveRoute;
+            expect(() => (<any>inst).validateRoutes(recursiveRoute)).toThrowError(/self-referential/i);
         });
     });
     
     describe('.validateRoute', () => {
-        xit('should fail if route is is null or falsey', () => {
-            
+        it('should fail if route is is null or falsey', () => {
+            expect(() => (<any>inst).validateRoute(null)).toThrowError(/route.* is falsey/i);
+            expect(() => (<any>inst).validateRoute()).toThrowError(/route.* is falsey/i);
         });
-        xit('should fail if the route tree structure is recursive', () => {
-            
+        it('should fail if route is not an object', () => {
+            expect(() => (<any>inst).validateRoute(42)).toThrowError(/must be.* object/i);
         });
-        xit('should fail if route is not an object', () => {
-            
+        it('should fail if route path is not a string', () => {
+            expect(() => (<any>inst).validateRoute({ path: 42 })).toThrowError(/path value.* string/i);
         });
-        xit('should fail if route path is not a string', () => {
-            
+        it('should fail if the route does not have a valid template ref', () => {
+            expect(() => (<any>inst).validateRoute({ path: '/' })).toThrowError(/must have.* template/i);
+            expect(() => (<any>inst).validateRoute({ path: '/', template: 42 })).toThrowError(/template.* must be.*/i);
+            expect(() => (<any>inst).validateRoute({ path: '/', template: { dep: 42 } })).toThrowError(/template.* must be.*/i);
+            expect(() => (<any>inst).validateRoute({ path: '/', template: { factory: 42 } })).toThrowError(/template.* must be.*/i);
+            expect(() => (<any>inst).validateRoute({ path: '/', template: 'name' })).not.toThrow();
+            expect(() => (<any>inst).validateRoute({ path: '/', template: { dep: 'name' } })).not.toThrow();
+            expect(() => (<any>inst).validateRoute({ path: '/', template: { factory: 'name' } })).not.toThrow();
         });
-        xit('should fail if route template is not a valid template reference or inline template', () => {
-            
-        });
-        xit('should invoke validateRoute on each child route', () => {
-            
+        it('should invoke validateRoute on each child route', () => {
+            spyOn(<any>inst, 'validateRoute').and.callThrough();
+            (<any>inst).validateRoute({ path: 'orange', template: 'myTemplate', children: cloneDeep(tripleRoutes) });
+            expect((<any>inst).validateRoute).toHaveBeenCalledTimes(tripleRoutes.length + 1);
         });
     });
     
     describe('.getRoutes', () => {
-        xit('should fail if awaitRoutes false and loadRoutes has not been called', async () => {
-            
+        beforeEach(() => {
+            (<any>_document).emitEvent('DOMContentLoaded', {});
         });
-        xit('should wait for the user to call loadRoutes if awaitRoutes is true and loadRoutes has not been called', async () => {
-            
+        
+        it('should fail if awaitRoutes false and loadRoutes has not been called', async () => {
+            try {
+                await inst.getRoutes();
+            }
+            catch (e) {
+                expect(e.message).toMatch(/no routes.* loaded/i);
+                return;
+            }
+            expect(true).toBeFalsy();
         });
-        xit('should wait for loadRoutes to complete and resolve with the loaded routes', async () => {
-            
+        it('should wait for the user to call loadRoutes if awaitRoutes is true and loadRoutes has not been called', async () => {
+            let loadedRoutesManually = false;
+            let otherThread = (async () => {
+                await inst.getRoutes(true);
+                expect(loadedRoutesManually).toBe(true);
+            })();
+            loadedRoutesManually = true;
+            await inst.loadRoutes(cloneDeep(singleRoute));
+        });
+        it('should wait for loadRoutes to complete and resolve with the loaded routes', async () => {
+            let expected = cloneDeep(singleRoute);
+            await inst.loadRoutes(expected);
+            let result = await inst.getRoutes();
+            expect(result).toBe(expected);
         });
     });
     
     describe('.navigateTo', () => {
+        beforeEach(() => {
+            (<any>_document).emitEvent('DOMContentLoaded', {});
+        });
+        
         xit('should not fail if awaitRoutes is true and loadRoutes has not yet been called', async () => {
             
         });
@@ -129,6 +214,10 @@ describe('Router', () => {
     });
     
     describe('.loadRouteTemplates', () => {
+        beforeEach(() => {
+            (<any>_document).emitEvent('DOMContentLoaded', {});
+        });
+        
         describe('when the route is null', () => {
             xit(`should return 'Not found' for the title and template`, async () => {
                 
@@ -170,6 +259,10 @@ describe('Router', () => {
     });
     
     describe('.findBestRoute', () => {
+        beforeEach(() => {
+            (<any>_document).emitEvent('DOMContentLoaded', {});
+        });
+        
         xit('should fail if no routes have been loaded', async () => {
             
         });

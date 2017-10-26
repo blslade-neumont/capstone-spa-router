@@ -50,7 +50,8 @@ export class Router {
         this._navigationObservable.subscribe(([route, path, pushState]) => {
             this.platform.performNavigation(route, path, pushState);
         });
-        this.navigateTo(document.location.pathname, false, true);
+        let location = this.platformAdapter.location;
+        this.navigateTo(location.pathname, false, true);
     }
     
     get dependencyLoader() {
@@ -103,9 +104,9 @@ export class Router {
     }
     private validateRoute(route: RouteEntryT) {
         if (!route) throw new Error(`One of the routes is falsey!`);
+        if (typeof route !== 'object') throw new Error(`Routes must be objects! Not ${route}`);
         if ((<any>route).__referenced__) throw new Error(`The router routes cannot be self-referential!`);
         (<any>route).__referenced__ = true;
-        if (typeof route !== 'object') throw new Error(`Routes must be objects! Not ${route}`);
         if (typeof route.path !== 'string') throw new Error(`Routes must have path values that are strings. Not ${route.path}`);
         if (typeof route.template !== 'string') {
             let template = route.template;
