@@ -1,12 +1,14 @@
 /// <reference types="jasmine" />
 
+import cloneDeep = require('lodash.clonedeep');
+
 import { Router } from '../router';
 import { DummyDependencyLoader } from '../../dependency-loader/dummy-dependency-loader';
 import { BrowserPlatformAdapter } from '../browser-platform-adapter';
+import { RouteEntryT } from '../schema';
 import { createMockDocument } from './mock-document';
 import { createMockWindow } from './mock-window';
 import { createMockHistory } from './mock-history';
-import cloneDeep = require('lodash.clonedeep');
 import { delay } from '../../util/delay';
 
 describe('Router', () => {
@@ -283,7 +285,7 @@ describe('Router', () => {
         describe('when the route is null', () => {
             it(`should return 'Not found' for the title and template`, async () => {
                 let [tpl, title] = await inst.loadRouteTemplates(null, '/a/b/c');
-                expect(tpl).toEqual(['Not found']);
+                expect(tpl).toEqual('Not found');
                 expect(title).toBe('Not Found');
             });
         });
@@ -303,13 +305,13 @@ describe('Router', () => {
                     { path: 'two', template: { dep: 'tpl-two' } },
                     { path: 'three', template: { dep: 'tpl-three' }, title: 'Title!' }
                 ], '/a/b/c');
-                expect(tpl).toEqual(['One!', 'Two!', 'Three!']);
+                expect(tpl).toEqual('One!Two!Three!');
             });
             it('should allow inline templates', async () => {
                 let [tpl, title] = await inst.loadRouteTemplates([
                     { path: 'one', template: 'One!!!' }
                 ], '/a/b/c');
-                expect(tpl).toEqual(['One!!!']);
+                expect(tpl).toEqual('One!!!');
             });
             it('should allow dependency-loaded templates', async () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.tpl.html', type: 'text' }]);
@@ -317,7 +319,7 @@ describe('Router', () => {
                 let [tpl, title] = await inst.loadRouteTemplates([
                     { path: 'one', template: { dep: 'tpl-one' } }
                 ], '/a/b/c');
-                expect(tpl).toEqual(['One!']);
+                expect(tpl).toEqual('One!');
             });
             it('should allow dependency-loaded template factories', async () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
@@ -325,7 +327,7 @@ describe('Router', () => {
                 let [tpl, title] = await inst.loadRouteTemplates([
                     { path: 'one', template: { factory: 'tpl-one' } }
                 ], '/a/b/c');
-                expect(tpl).toEqual(['((/a/b/c))']);
+                expect(tpl).toEqual('((/a/b/c))');
             });
             it('should fail if a template factory dependency is not a function', async () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
@@ -359,7 +361,7 @@ describe('Router', () => {
                 let [tpl, title] = await inst.loadRouteTemplates([
                     { path: 'one', template: { factory: 'tpl-one' } }
                 ], '/a/b/c');
-                expect(tpl).toEqual(['((/a/b/c))']);
+                expect(tpl).toEqual('((/a/b/c))');
             });
             it('should fail if the template does not resolve to be a string', async () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
@@ -407,6 +409,69 @@ describe('Router', () => {
                 ], '/a/b/c');
                 expect(title).toEqual('Title-Two!');
             });
+            it('should merge the templates from nested routes', async () => {
+                deps.addSchema([
+                    { name: 'tpl-one', src: 'one.tpl.html', type: 'text' },
+                    { name: 'tpl-two', src: 'two.tpl.html', type: 'text' },
+                    { name: 'tpl-three', src: 'three.tpl.html', type: 'text' }
+                ]);
+                deps.provide('tpl-one', 'one(<router-outlet></router-outlet>)eno');
+                deps.provide('tpl-two', 'two(<router-outlet></router-outlet>)owt');
+                deps.provide('tpl-three', 'three(!!!)eerht');
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: 'one', template: { dep: 'tpl-one' } },
+                    { path: 'two', template: { dep: 'tpl-two' } },
+                    { path: 'three', template: { dep: 'tpl-three' }, title: 'Title!' }
+                ], '/a/b/c');
+                expect(tpl).toEqual('one(two(three(!!!)eerht)owt)eno');
+            });
+        });
+    });
+    
+    describe('.mergeTemplates', () => {
+        let fn: (templates: string[]) => string;
+        beforeEach(() => {
+            fn = (<any>inst).mergeTemplates.bind(inst);
+        });
+        
+        it('should transclude a single template', () => {
+            let expected = 'Hello, World!';
+            let result = fn([expected]);
+            expect(result).toBe(expected);
+        });
+        it('should append templates if there is no router outlet', () => {
+            let tpls: string[] = ['One', 'Two'];
+            let result = fn(tpls);
+            expect(result).toBe(tpls.join(''));
+        });
+        it('should transclude templates if there is a router outlet', () => {
+            let tpls: string[] = ['one(<router-outlet></router-outlet>)eno', 'two'];
+            let expected = 'one(two)eno';
+            let result = fn(tpls);
+            expect(result).toBe(expected);
+        });
+        it('should mix transcluding and appending templates', () => {
+            let tpls: string[] = [
+                'one(<router-outlet></router-outlet>)eno',
+                'two',
+                'three(<router-outlet></router-outlet>)eerht',
+                'four'
+            ];
+            let expected = 'one(two)enothree(four)eerht';
+            let result = fn(tpls);
+            expect(result).toBe(expected);
+        });
+        it('should fail if a template includes more than one router outlet', () => {
+            let tpls: string[] = ['one(<router-outlet></router-outlet>)eno <router-outlet></router-outlet>', 'two'];
+            expect(() => fn(tpls)).toThrowError(/multiple router-outlet/i);
+        });
+        it('should fail if no templates are appended or transcluded', () => {
+            let tpls: string[] = ['', '', ''];
+            expect(() => fn(tpls)).toThrowError(/no.* substantial template/i);
+        });
+        it('should fail if the last template includes a router-outlet', () => {
+            let tpls: string[] = ['one', 'two', 'three <router-outlet></router-outlet>'];
+            expect(() => fn(tpls)).toThrowError(/router-outlet in leaf/i);
         });
     });
     
@@ -435,8 +500,181 @@ describe('Router', () => {
         });
         it('should return null if no route matches the path segments', async () => {
             await inst.loadRoutes(cloneDeep(tripleRoutes));
-            let result = await fn(['/fish/kisses']);
+            let result = await fn(['fish', 'kisses']);
             expect(result).toEqual(null);
+        });
+    });
+    
+    describe('.findFirstMatch', () => {
+        let fn: (segments: string[], routes: RouteEntryT[], allowRoot?: boolean) => RouteEntryT[] | null;
+        beforeEach(() => {
+            fn = (<any>inst).findFirstMatch.bind(inst);
+        });
+        
+        it('should match a single segment to a single matching route', () => {
+            const routes: RouteEntryT[] = [{ path: 'apple', template: '' }];
+            let result = fn(['apple'], routes, true);
+            expect(result).toEqual([routes[0]]);
+        });
+        it('should not match a single segment to a non-matching route', () => {
+            const routes: RouteEntryT[] = [{ path: 'orange', template: '' }];
+            let result = fn(['apple'], routes, true);
+            expect(result).toBeNull();
+        });
+        it('should match a single segment to a single matching route starting with a forward slash', () => {
+            const routes: RouteEntryT[] = [{ path: '/apple', template: '' }];
+            let result = fn(['apple'], routes, true);
+            expect(result).toEqual([routes[0]]);
+        });
+        it('should match a single segment as a nested route with to ancestor path segments', () => {
+            const routes: RouteEntryT[] = [
+                {path: '', template: 'layout 1', children: [
+                    {path: '', template: 'distraction'},
+                    {path: '', template: 'layout 2', children: [
+                        {path: 'apple', template: 'homepage'}
+                    ]}
+                ]}
+            ];
+            let result = fn(['apple'], routes, true);
+            expect(result).toEqual([routes[0], routes[0].children[1], routes[0].children[1].children[0]]);
+        });
+        it('should match a single segment with descendent routes with empty path segments', () => {
+            const routes: RouteEntryT[] = [
+                {path: 'orange', template: 'distraction'},
+                {path: 'apple', template: 'root', children: [
+                    {path: '', template: 'layout 1', children: [
+                        {path: '', template: 'homepage'}
+                    ]}
+                ]}
+            ];
+            let result = fn(['apple'], routes, true);
+            expect(result).toEqual([routes[1], routes[1].children[0], routes[1].children[0].children[0]]);
+        });
+        it('should match a single segment with surrounding routes with empty path segments', () => {
+            const routes: RouteEntryT[] = [
+                {path: '', template: 'root', children: [
+                    {path: 'orange', template: 'distraction'},
+                    {path: 'apple', template: 'layout 1', children: [
+                        {path: '', template: 'homepage'}
+                    ]},
+                    {path: 'peach', template: 'distraction'}
+                ]}
+            ];
+            let result = fn(['apple'], routes, true);
+            expect(result).toEqual([routes[0], routes[0].children[1], routes[0].children[1].children[0]]);
+        });
+        it('should match multiple segments to multiple matching routes', () => {
+            const routes: RouteEntryT[] = [
+                {path: 'one', template: 'one', children: [
+                    {path: 'two', template: 'two', children: [
+                        {path: 'three', template: 'three'}
+                    ]}
+                ]}
+            ];
+            let result = fn(['one', 'two', 'three'], routes, true);
+            expect(result).toEqual([routes[0], routes[0].children[0], routes[0].children[0].children[0]]);
+        });
+        it('should match multiple segments to a single matching route', () => {
+            const routes: RouteEntryT[] = [{path: 'one/two/three', template: 'one, two, and three'}];
+            let result = fn(['one', 'two', 'three'], routes, true);
+            expect(result).toEqual([routes[0]]);
+        });
+        it('should match multiple segments to a single matching route with a forward slash', () => {
+            const routes: RouteEntryT[] = [{path: '/one/two/three', template: 'one, two, and three'}];
+            let result = fn(['one', 'two', 'three'], routes, true);
+            expect(result).toEqual([routes[0]]);
+        });
+        it('should match multiple segments to multiple matching routes surrounded by routes with empty path segments', () => {
+            const routes: RouteEntryT[] = [
+                {path: '', template: 'layout', children: [
+                    {path: 'one', template: 'distraction', children: [
+                        {path: 'three', template: 'three'}
+                    ]},
+                    {path: 'one/two', template: 'one and two', children: [
+                        {path: '', template: 'layout 2', children: [
+                            {path: 'three', template: 'three', children: [
+                                {path: '', template: 'layout 3'}
+                            ]}
+                        ]}
+                    ]}
+                ]}
+            ];
+            let result = fn(['one', 'two', 'three'], routes, true);
+            expect(result).toEqual([
+                routes[0],
+                routes[0].children[1],
+                routes[0].children[1].children[0],
+                routes[0].children[1].children[0].children[0],
+                routes[0].children[1].children[0].children[0].children[0]
+            ]);
+        });
+        
+        describe('when allowRoot is true', () => {
+            it('should match the root', () => {
+                const routes: RouteEntryT[] = [{ path: '/', template: '' }];
+                let result = fn(['/'], routes, true);
+                expect(result).toEqual([routes[0]]);
+            });
+            it('should not match the root if there are unused segments', () => {
+                const routes: RouteEntryT[] = [{ path: '/', template: '' }];
+                let result = fn(['/', 'orange'], routes, true);
+                expect(result).toBeNull();
+            });
+            it('should match the root as a nested route with to ancestor path segments', () => {
+                const routes: RouteEntryT[] = [
+                    {path: '', template: 'layout 1', children: [
+                        {path: '', template: 'layout 2', children: [
+                            {path: '/', template: 'homepage'}
+                        ]}
+                    ]}
+                ];
+                let result = fn(['/'], routes, true);
+                expect(result).toEqual([routes[0], routes[0].children[0], routes[0].children[0].children[0]]);
+            });
+            it('should match the root with descendent routes with empty path segments', () => {
+                const routes: RouteEntryT[] = [
+                    {path: '/', template: 'root', children: [
+                        {path: '', template: 'layout 1', children: [
+                            {path: '', template: 'homepage'}
+                        ]}
+                    ]}
+                ];
+                let result = fn(['/'], routes, true);
+                expect(result).toEqual([routes[0], routes[0].children[0], routes[0].children[0].children[0]]);
+            });
+            it('should match the root with surrounding routes with empty path segments', () => {
+                const routes: RouteEntryT[] = [
+                    {path: '', template: 'root', children: [
+                        {path: '/', template: 'layout 1', children: [
+                            {path: '', template: 'homepage'}
+                        ]}
+                    ]}
+                ];
+                let result = fn(['/'], routes, true);
+                expect(result).toEqual([routes[0], routes[0].children[0], routes[0].children[0].children[0]]);
+            });
+        });
+        
+        describe('when allowRoot is false', () => {
+            it('should not match the root', () => {
+                const routes: RouteEntryT[] = [{ path: '/', template: '' }];
+                let result = fn(['/'], routes, false);
+                expect(result).toBeNull();
+            });
+        });
+    });
+    
+    describe('.pathSegmentsMatch', () => {
+        let fn: (segment: string, routeSegment: string) => boolean;
+        beforeEach(() => {
+            fn = (<any>inst).pathSegmentsMatch.bind(inst);
+        });
+        
+        it('should return true if both segments are an exact match', () => {
+            expect(fn('fish', 'fish')).toBe(true);
+        });
+        it('should return false if the segments do not match', () => {
+            expect(fn('fish', 'horse')).toBe(false);
         });
     });
 });

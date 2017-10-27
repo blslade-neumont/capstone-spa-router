@@ -236,7 +236,7 @@ describe('BrowserPlatformAdapter', () => {
                 beforeEach(() => {
                     spyOn(router, 'loadRouteTemplates').and.callFake(async () => {
                         (<any>inst).navIdx++;
-                        return delay(10).then(() => [['tpl'], 'title']);
+                        return delay(10).then(() => ['tpl', 'title']);
                     });
                 });
                 

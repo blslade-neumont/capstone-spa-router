@@ -87,14 +87,13 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
             path: path
         });
         
-        let tpl: string[];
+        let tpl: string;
         let title: string;
         [tpl, title] = await this.router.loadRouteTemplates(route, path);
         
         if (currentNavIdx !== this.navIdx) return;
         
-        if (tpl.length !== 1) throw new Error(`Not implemented: nested routes`);
-        this._outlet.innerHTML = tpl[0];
+        this._outlet.innerHTML = tpl;
         this._document.title = title;
         if (modifyHistory) {
             let historyFn = this._history[pushState ? 'pushState' : 'replaceState'];

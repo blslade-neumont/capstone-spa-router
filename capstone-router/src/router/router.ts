@@ -155,7 +155,7 @@ export class Router {
         return true;
     }
     
-    async loadRouteTemplates(route: RouteEntryT[] | null, path: string): Promise<[string[], string]> {
+    async loadRouteTemplates(route: RouteEntryT[] | null, path: string): Promise<[string, string]> {
         let tpl: string[];
         let title: string;
         if (!route) {
@@ -194,15 +194,71 @@ export class Router {
                 }
             }
         }
-        return [tpl, title];
+        return [this.mergeTemplates(tpl), title];
+    }
+    private mergeTemplates(templates: string[]): string {
+        let routerOutletEl = '<router-outlet></router-outlet>';
+        let html = routerOutletEl;
+        let firstIdx: number;
+        for (let tpl of templates) {
+            if (!tpl || tpl.trim() === routerOutletEl) continue;
+            firstIdx = html.indexOf(routerOutletEl);
+            let before: string, after: string;
+            if (firstIdx === -1) {
+                before = html;
+                after = '';
+            }
+            else {
+                before = html.substr(0, firstIdx);
+                after = html.substr(firstIdx + routerOutletEl.length);
+                firstIdx = after.indexOf(routerOutletEl);
+                if (firstIdx !== -1) throw new Error(`Invalid template, contains multiple router-outlet elements.`);
+            }
+            html = before + tpl + after;
+        }
+        if (html === routerOutletEl) throw new Error(`Invalid route template, no route provides a substantial template.`);
+        firstIdx = html.indexOf(routerOutletEl);
+        if (firstIdx !== -1) throw new Error(`Invalid route template, router-outlet in leaf node.`);
+        return html;
     }
     
     private async findBestRoute(segments: string[]): Promise<RouteEntryT[] | null> {
         let routes = await this.getRoutes();
-        if (segments.length != 1) return null;
+        return this.findFirstMatch(segments, routes, true);
+    }
+    private findFirstMatch(segments: string[], routes: RouteEntryT[], allowRoot = false): RouteEntryT[] | null {
         for (let route of routes) {
-            if (route.path === segments[0]) return [route];
+            let split = route.path.split('/').filter(Boolean);
+            if (split.length === 0 && route.path.startsWith('/')) {
+                if (allowRoot) split.push('/');
+                else continue;
+            }
+            let isMatch = true;
+            let matchedTo = 0;
+            for (let q = 0; q < split.length; q++) {
+                if (matchedTo >= segments.length) {
+                    isMatch = false;
+                    break;
+                }
+                if (!this.pathSegmentsMatch(segments[matchedTo], split[q])) {
+                    isMatch = false;
+                    break;
+                }
+                matchedTo++;
+            }
+            if (!isMatch) continue;
+            let childSegments = segments.slice(matchedTo);
+            if (route.children) {
+                let bestChildMatch = this.findFirstMatch(childSegments, route.children, allowRoot && split.length === 0);
+                if (!bestChildMatch) continue;
+                return [route, ...bestChildMatch];
+            }
+            else if (childSegments.length !== 0) continue;
+            return [route];
         }
         return null;
+    }
+    private pathSegmentsMatch(segment: string, routeSegment: string) {
+        return segment === routeSegment;
     }
 }
