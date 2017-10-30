@@ -5,7 +5,7 @@ import { RouteEntryT } from './schema';
 import { RouterEventT } from './events';
 
 export class BrowserPlatformAdapter extends PlatformAdapter {
-    constructor() {
+    constructor(private debugHistory = false) {
         super();
         this._document = document;
         this._window = window;
@@ -93,14 +93,17 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
         
         if (currentNavIdx !== this.navIdx) return;
         
-        this._outlet.innerHTML = tpl;
-        this._document.title = title;
         if (modifyHistory) {
             let historyFn = this._history[pushState ? 'pushState' : 'replaceState'];
             historyFn = historyFn.bind(this._history);
             let location = this._document.location;
-            historyFn({ route: route, path: path }, this._document.title, location.protocol + '//' + location.host + path);
+            let data = { route: route, path: path };
+            let newUrl = location.protocol + '//' + location.host + path;
+            if (this.debugHistory) console.log((pushState ? 'Pushing' : 'Replacing') + ' state. data:', data, 'title:', title, 'url:', newUrl);
+            historyFn(data, title, newUrl);
         }
+        this._outlet.innerHTML = tpl;
+        this._document.title = title;
         if (pushState) this._window.scrollTo(0, 0);
         this.eventsSubject.next({
             type: 'end',
