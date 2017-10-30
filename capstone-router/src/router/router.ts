@@ -222,7 +222,7 @@ export class Router {
     private replaceRouteParamReferences(body: string, params: { [key: string]: string }): string {
         let keys = Object.keys(params);
         for (let key of keys) {
-            let regex = new RegExp(`\\bROUTE[_\\-]?PARAM(ETER)?:${this.escapeRegex(key)}\\b`, 'g');
+            let regex = new RegExp(`\\bROUTE[_\\-]?PARAM(ETER)?:${this.escapeRegex(key)}`, 'g');
             body = body.replace(regex, this.escapeHTML(params[key]));
         }
         return body;

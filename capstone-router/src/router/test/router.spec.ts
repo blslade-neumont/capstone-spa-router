@@ -483,6 +483,18 @@ describe('Router', () => {
                 ], '/yes');
                 expect(tpl).toBe('yes ROUTE-PARAM:a*b!');
             });
+            it('should replace catchall route path references in the template', async () => {
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: '**', template: 'ROUTE-PARAM:**!' }
+                ], '/catchall/route');
+                expect(tpl).toBe('catchall/route!');
+            });
+            it('should replace catchall route path references in the title', async () => {
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: '**', template: 'My template', title: 'ROUTE-PARAM:**!' }
+                ], '/catchall/route');
+                expect(title).toBe('catchall/route!');
+            });
         });
     });
     
