@@ -2,10 +2,12 @@
 
 * {
     box-sizing: border-box;
+    font-size: 24pt;
 }
 
 body {
-    margin: 0;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 0;
 }
 
