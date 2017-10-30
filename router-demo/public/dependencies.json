@@ -3,26 +3,42 @@
     "content": [{
         "name": "routes",
         "type": "text",
-        "src": "routes.json"
+        "src": "/routes.json"
+    }, {
+        "name": "layout-tpl",
+        "type": "text",
+        "src": "/templates/layout.tpl.html"
     }, {
         "name": "home-tpl",
         "type": "text",
-        "src": "templates/home.tpl.html"
+        "src": "/templates/home.tpl.html"
     }, {
         "name": "about-tpl",
         "type": "text",
-        "src": "templates/about.tpl.html"
+        "src": "/templates/about.tpl.html"
+    }, {
+        "name": "pages-tpl",
+        "type": "text",
+        "src": "/templates/pages.tpl.html"
+    }, {
+        "name": "pages-root-tpl",
+        "type": "text",
+        "src": "/templates/pages-root.tpl.html"
     }, {
         "name": "page1-tpl",
         "type": "text",
-        "src": "templates/page1.tpl.html"
+        "src": "/templates/page1.tpl.html"
     }, {
         "name": "page2-tpl",
         "type": "text",
-        "src": "templates/page2.tpl.html"
+        "src": "/templates/page2.tpl.html"
     }, {
         "name": "page3-tpl",
         "type": "text",
-        "src": "templates/page3.tpl.html"
+        "src": "/templates/page3.tpl.html"
+    }, {
+        "name": "not-found-tpl",
+        "type": "text",
+        "src": "/templates/not-found.tpl.html"
     }]
 }
