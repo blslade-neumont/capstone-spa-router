@@ -329,6 +329,40 @@ describe('Router', () => {
                 ], '/a/b/c');
                 expect(tpl).toEqual('((/a/b/c))');
             });
+            it('should pass template parameters into template factories', async () => {
+                let expectedAnimal = 'horse';
+                deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
+                deps.provide('tpl-one', (path: string, params: { [key: string]: string }) => {
+                    expect(params.animal).toBe(expectedAnimal);
+                    return `((${path}))`;
+                });
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: ':animal', template: { factory: 'tpl-one' } }
+                ], `/${expectedAnimal}`);
+            });
+            it('should not pass template parameters for deeper nested routes', async () => {
+                deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
+                deps.provide('tpl-one', (path: string, params: { [key: string]: string }) => {
+                    expect(params.animal).toBeUndefined();
+                    return `((${path}))`;
+                });
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: 'eat', template: { factory: 'tpl-one' } },
+                    { path: ':animal', template: 'fishies!' }
+                ], `/eat/horse`);
+            });
+            it('should pass template parameters for parent nested routes', async () => {
+                let expectedAnimal = 'horse';
+                deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
+                deps.provide('tpl-one', (path: string, params: { [key: string]: string }) => {
+                    expect(params.animal).toBe(expectedAnimal);
+                    return `((${path}))`;
+                });
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: ':animal', template: 'fishies!' },
+                    { path: 'eat', template: { factory: 'tpl-one' } }
+                ], `/${expectedAnimal}/eat`);
+            });
             it('should fail if a template factory dependency is not a function', async () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
                 deps.provide('tpl-one', 'One!!!');
@@ -423,7 +457,31 @@ describe('Router', () => {
                     { path: 'two', template: { dep: 'tpl-two' } },
                     { path: 'three', template: { dep: 'tpl-three' }, title: 'Title!' }
                 ], '/a/b/c');
-                expect(tpl).toEqual('one(two(three(!!!)eerht)owt)eno');
+                expect(tpl).toBe('one(two(three(!!!)eerht)owt)eno');
+            });
+            it('should replace route parameter references in the template', async () => {
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: ':animal', template: 'You selected ROUTE-PARAM:animal!' }
+                ], '/horse');
+                expect(tpl).toBe('You selected horse!');
+            });
+            it('should replace route parameter references in the title', async () => {
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: ':animal', template: 'Template', title: 'Animal: ROUTE-PARAM:animal' }
+                ], '/horse');
+                expect(title).toBe('Animal: horse');
+            });
+            it('should not allow route parameter replacements to insert html', async () => {
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: ':animal', template: 'You selected ROUTE-PARAM:animal!' }
+                ], '/<br>');
+                expect(tpl).toBe('You selected &lt;br&gt;!');
+            });
+            it('should escape special regex characters in route param name replacements', async () => {
+                let [tpl, title] = await inst.loadRouteTemplates([
+                    { path: ':a.b', template: 'ROUTE-PARAM:a.b ROUTE-PARAM:a*b!' }
+                ], '/yes');
+                expect(tpl).toBe('yes ROUTE-PARAM:a*b!');
             });
         });
     });
@@ -608,6 +666,43 @@ describe('Router', () => {
                 routes[0].children[1].children[0].children[0].children[0]
             ]);
         });
+        it('should match routes that contain route parameters', () => {
+            const routes: RouteEntryT[] = [{ path: '/:animal', template: '' }];
+            let result = fn(['fish'], routes, true);
+            expect(result).toEqual([routes[0]]);
+        });
+        it('should not match multiple segments to a single route parameter', () => {
+            const routes: RouteEntryT[] = [{ path: '/:animal', template: '' }];
+            let result = fn(['fish', 'horse'], routes, true);
+            expect(result).toBeNull();
+        });
+        it('should match all existing route parameters', () => {
+            const routes: RouteEntryT[] = [{ path: '/:animal/:color/:number', template: '' }];
+            let result = fn(['fish', 'blue', '42'], routes, true);
+            expect(result).toEqual([routes[0]]);
+        });
+        it('should match multiple segments to multiple matching routes with route parameters', () => {
+            const routes: RouteEntryT[] = [
+                {path: ':one', template: 'one', children: [
+                    {path: ':two', template: 'two', children: [
+                        {path: ':three', template: 'three'}
+                    ]}
+                ]}
+            ];
+            let result = fn(['one!!', 'two!!', 'three!!'], routes, true);
+            expect(result).toEqual([routes[0], routes[0].children[0], routes[0].children[0].children[0]]);
+        });
+        it('should match multiple segments to multiple matching routes each with 0-2 route parameters', () => {
+            const routes: RouteEntryT[] = [
+                {path: '/:one/:two', template: 'one', children: [
+                    {path: '', template: 'two', children: [
+                        {path: ':three', template: 'three'}
+                    ]}
+                ]}
+            ];
+            let result = fn(['one!!', 'two!!', 'three!!'], routes, true);
+            expect(result).toEqual([routes[0], routes[0].children[0], routes[0].children[0].children[0]]);
+        });
         
         describe('when allowRoot is true', () => {
             it('should match the root', () => {
@@ -675,6 +770,10 @@ describe('Router', () => {
         });
         it('should return false if the segments do not match', () => {
             expect(fn('fish', 'horse')).toBe(false);
+        });
+        it('should return match any path segment to a route parameter segment', () => {
+            expect(fn('horse', ':animal')).toBe(true);
+            expect(fn('donkey', ':animal')).toBe(true);
         });
     });
 });

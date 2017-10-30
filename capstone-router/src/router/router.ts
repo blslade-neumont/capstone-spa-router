@@ -163,8 +163,11 @@ export class Router {
             title = 'Not Found';
         }
         else {
-            tpl = await Promise.all(route.map(async (rt) => {
+            let allPathSegments = path.split('/').filter(Boolean);
+            tpl = await Promise.all(route.map(async (rt, idx) => {
                 let tpl = rt.template;
+                let allRouteSegments = (<string[]>[]).concat(...route.slice(0, idx + 1).map(rt => rt.path.split('/').filter(Boolean)));
+                let params = this.calculateRouteParams(allRouteSegments, allPathSegments);
                 if (typeof tpl !== 'string') {
                     let dep = <string>(<any>tpl).dep,
                         factory = <string>(<any>tpl).factory;
@@ -178,12 +181,13 @@ export class Router {
                     }
                     else throw new Error(`Invalid template parameter: ${tpl}`);
                     if (typeof result === 'function') {
-                        result = result(path);
+                        result = result(path, params);
                         if (result && result.then) result = await result;
                     }
                     if (typeof result !== 'string') throw new Error(`Route template must be a string! Invalid template: '${result}'`);
                     tpl = result;
                 }
+                tpl = this.replaceRouteParamReferences(tpl, params);
                 return tpl;
             }));
             title = 'Untitled Page';
@@ -193,8 +197,44 @@ export class Router {
                     break;
                 }
             }
+            let allRouteSegments = (<string[]>[]).concat(...route.map(rt => rt.path.split('/').filter(Boolean)));
+            let params = this.calculateRouteParams(allRouteSegments, allPathSegments);
+            title = this.replaceRouteParamReferences(title, params);
         }
         return [this.mergeTemplates(tpl), title];
+    }
+    private calculateRouteParams(routeSegments: string[], pathSegments: string[]): { [key: string]: string } {
+        let params: { [key: string]: string } = Object.create(null);
+        let pathIdx = 0;
+        for (let q = 0; q < routeSegments.length; q++) {
+            if (pathIdx >= pathSegments.length) throw new Error(`Too few path segments passed into 'calculateRouteParams'.`);
+            let routeSeg = routeSegments[q];
+            if (routeSeg.startsWith(':')) params[routeSeg.substr(1)] = pathSegments[pathIdx];
+            pathIdx++;
+        }
+        return params;
+    }
+    private replaceRouteParamReferences(body: string, params: { [key: string]: string }): string {
+        let keys = Object.keys(params);
+        for (let key of keys) {
+            let regex = new RegExp(`\\bROUTE[_\\-]?PARAM(ETER)?:${this.escapeRegex(key)}\\b`, 'g');
+            body = body.replace(regex, this.escapeHTML(params[key]));
+        }
+        return body;
+    }
+    private escapeRegex(str: string) {
+        //Taken from https://makandracards.com/makandra/15879-javascript-how-to-generate-a-regular-expression-from-a-string
+        return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    }
+    private static readonly escapeHtmlMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    private escapeHTML(str: string) {
+        return str.replace(/[&<>"']/g, m => Router.escapeHtmlMap[m]);
     }
     private mergeTemplates(templates: string[]): string {
         let routerOutletEl = '<router-outlet></router-outlet>';
@@ -259,6 +299,6 @@ export class Router {
         return null;
     }
     private pathSegmentsMatch(segment: string, routeSegment: string) {
-        return segment === routeSegment;
+        return segment === routeSegment || routeSegment.startsWith(':');
     }
 }

@@ -27,7 +27,6 @@
     "devDependencies": {
         "@types/jasmine": "^2.5.38",
         "@types/jasmine-matchers": "^0.2.30",
-        "@types/lodash.merge": "^4.6.3",
         "awesome-typescript-loader": "^3.2.3",
         "config": "^1.26.2",
         "jasmine-core": "^2.5.2",
