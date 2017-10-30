@@ -486,6 +486,43 @@ describe('Router', () => {
         });
     });
     
+    describe('.calculateRouteParams', () => {
+        let fn: (routeSegments: string[], pathSegments: string[]) => { [key: string]: string };
+        beforeEach(() => {
+            fn = (<any>inst).calculateRouteParams.bind(inst);
+        });
+        
+        it('should capture route parameters', () => {
+            let results = fn([':animal', ':color', ':number'], ['fish', 'blue', '42']);
+            expect(results).toEqual({
+                animal: 'fish',
+                color: 'blue',
+                number: '42'
+            });
+        });
+        it('should capture catchall paths', () => {
+            let results = fn([':animal', '**'], ['fish', 'blue', '42']);
+            expect(results).toEqual({
+                animal: 'fish',
+                '**': 'blue/42'
+            });
+        });
+        it('should empty capture catchall paths', () => {
+            let results = fn([':animal', '**'], ['fish']);
+            expect(results).toEqual({
+                animal: 'fish',
+                '**': ''
+            });
+        });
+        it('should throw an error if there are too few path segments for the routes', () => {
+            expect(() => fn([':animal'], [])).toThrowError(/too few.* segments/i);
+        });
+    });
+    
+    //TODO: test escapeRouteParamReferences
+    //TODO: test escapeRegex
+    //TODO: test escapeHTML
+    
     describe('.mergeTemplates', () => {
         let fn: (templates: string[]) => string;
         beforeEach(() => {
@@ -702,6 +739,48 @@ describe('Router', () => {
             ];
             let result = fn(['one!!', 'two!!', 'three!!'], routes, true);
             expect(result).toEqual([routes[0], routes[0].children[0], routes[0].children[0].children[0]]);
+        });
+        it('should match a single segment to the catchall route', () => {
+            const routes: RouteEntryT[] = [{ path: '**', template: '' }];
+            let result = fn(['apple'], routes, true);
+            expect(result).toEqual([routes[0]]);
+        });
+        it('should match an empty segment to the catchall route', () => {
+            const routes: RouteEntryT[] = [{ path: '**', template: '' }];
+            let result = fn([''], routes, true);
+            expect(result).toEqual([routes[0]]);
+        });
+        it('should match multiple segments to the catchall route', () => {
+            const routes: RouteEntryT[] = [{ path: '**', template: '' }];
+            let result = fn(['apple', 'orange', 'peach'], routes, true);
+            expect(result).toEqual([routes[0]]);
+        });
+        it('should match the catchall route if the child routes have empty paths', () => {
+            const routes: RouteEntryT[] = [
+                {path: '**', template: '', children: [
+                    {path: '', template: ''}
+                ]}
+            ];
+            let result = fn(['apple', 'orange', 'peach'], routes, true);
+            expect(result).toEqual([routes[0], routes[0].children[0]]);
+        });
+        it('should not match the catchall route if the child route paths are not empty', () => {
+            const routes: RouteEntryT[] = [
+                {path: '**', template: '', children: [
+                    {path: 'fish', template: ''}
+                ]}
+            ];
+            let result = fn(['apple', 'orange', 'peach'], routes, true);
+            expect(result).toBeNull();
+        });
+        it('should not match the catchall route if the child route paths are not empty even if they could be matched', () => {
+            const routes: RouteEntryT[] = [
+                {path: '**', template: '', children: [
+                    {path: 'fish', template: ''}
+                ]}
+            ];
+            let result = fn(['apple', 'orange', 'peach', 'fish'], routes, true);
+            expect(result).toBeNull();
         });
         
         describe('when allowRoot is true', () => {

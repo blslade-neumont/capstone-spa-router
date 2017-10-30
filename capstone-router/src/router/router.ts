@@ -204,11 +204,16 @@ export class Router {
         return [this.mergeTemplates(tpl), title];
     }
     private calculateRouteParams(routeSegments: string[], pathSegments: string[]): { [key: string]: string } {
-        let params: { [key: string]: string } = Object.create(null);
+        let params: { [key: string]: string } = {};
         let pathIdx = 0;
         for (let q = 0; q < routeSegments.length; q++) {
-            if (pathIdx >= pathSegments.length) throw new Error(`Too few path segments passed into 'calculateRouteParams'.`);
             let routeSeg = routeSegments[q];
+            if (routeSeg === '**') {
+                params['**'] = pathSegments.slice(pathIdx).join('/');
+                pathIdx = pathSegments.length;
+                break;
+            }
+            if (pathIdx >= pathSegments.length) throw new Error(`Too few path segments passed into 'calculateRouteParams'.`);
             if (routeSeg.startsWith(':')) params[routeSeg.substr(1)] = pathSegments[pathIdx];
             pathIdx++;
         }
@@ -276,6 +281,10 @@ export class Router {
             let isMatch = true;
             let matchedTo = 0;
             for (let q = 0; q < split.length; q++) {
+                if (split[q] === '**') {
+                    matchedTo = segments.length;
+                    break;
+                }
                 if (matchedTo >= segments.length) {
                     isMatch = false;
                     break;
