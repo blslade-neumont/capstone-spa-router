@@ -6,6 +6,10 @@ before_script:
   - yarn
   - cd router-spike && yarn && cd ..
   - cd dep-loader-spike && yarn && cd ..
+  - cd capstone-router && yarn && cd ..
+  - cd launchpad && yarn && cd ..
+  - cd dependency-loader-visualizer && yarn && cd ..
+  - cd router-demo && yarn && cd ..
 
 script:
   - yarn travis -q
