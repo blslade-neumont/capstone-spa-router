@@ -7,7 +7,7 @@
             "request": "launch",
             "sourceMaps": true,
             "smartStep": true,
-            "url": "http://localhost:8081",
+            "url": "http://localhost:8080",
             "sourceMapPathOverrides": {
                 "webpack:///./~/*": "${workspaceRoot}/node_modules/*",
                 "webpack:///./src/*": "${workspaceRoot}/src/*"
