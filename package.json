@@ -10,18 +10,20 @@
     "scripts": {
         "travis": "bash ./scripts/travis.sh",
         "deploy": "bash ./scripts/deploy.sh",
-        "serve-all": "concurrently \"yarn serve-launchpad\" \"yarn serve-dep-loader-spike\" \"yarn serve-router-spike\" \"yarn serve-dependency-loader-visualizer\" \"yarn serve-router-demo\"",
+        "serve-all": "concurrently \"yarn serve-launchpad\" \"yarn serve-dep-loader-spike\" \"yarn serve-router-spike\" \"yarn serve-dependency-loader-visualizer\" \"yarn serve-router-demo\" \"yarn serve-programmatic-navigation-demo\"",
         "serve-launchpad": "cd launchpad && yarn serve",
         "serve-dep-loader-spike": "cd dep-loader-spike && yarn serve",
         "serve-router-spike": "cd router-spike && yarn serve",
         "serve-dependency-loader-visualizer": "cd dependency-loader-visualizer && yarn serve",
         "serve-router-demo": "cd router-demo && yarn serve",
-        "build-all": "yarn build-launchpad && yarn build-dep-loader-spike && yarn build-router-spike && yarn build-dependency-loader-visualizer && yarn build-router-demo",
+        "serve-programmatic-navigation-demo": "cd programmatic-navigation-demo && yarn serve",
+        "build-all": "yarn build-launchpad && yarn build-dep-loader-spike && yarn build-router-spike && yarn build-dependency-loader-visualizer && yarn build-router-demo && yarn build-programmatic-navigation-demo",
         "build-launchpad": "cd launchpad && yarn build",
         "build-dep-loader-spike": "cd dep-loader-spike && yarn build",
         "build-router-spike": "cd router-spike && yarn build",
         "build-dependency-loader-visualizer": "cd dependency-loader-visualizer && yarn build",
-        "build-router-demo": "cd router-demo && yarn build"
+        "build-router-demo": "cd router-demo && yarn build",
+        "build-programmatic-navigation-demo": "cd programmatic-navigation-demo && yarn build"
     },
     "devDependencies": {},
     "dependencies": {
