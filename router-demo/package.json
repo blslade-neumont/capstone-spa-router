@@ -1,7 +1,7 @@
 {
-    "name": "@aboveyou00/dependency-loader-visualizer",
+    "name": "@aboveyou00/router-demo",
     "version": "0.0.0",
-    "description": "Capstone project for Brandon Slade - dependency loader visualizer",
+    "description": "Capstone project for Brandon Slade - router demo",
     "author": {
         "name": "Brandon Slade",
         "email": "brandonyoyoslade@gmail.com",

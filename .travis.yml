@@ -10,6 +10,8 @@ before_script:
   - cd launchpad && yarn && cd ..
   - cd dependency-loader-visualizer && yarn && cd ..
   - cd router-demo && yarn && cd ..
+  - cd programmatic-navigation-demo && yarn && cd ..
+  - cd heavy-bundle-demo && yarn && cd ..
 
 script:
   - yarn travis -q

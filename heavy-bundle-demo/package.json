@@ -1,7 +1,7 @@
 {
-    "name": "@aboveyou00/programmatic-navigation-demo",
+    "name": "@aboveyou00/heavy-bundle-demo",
     "version": "0.0.0",
-    "description": "Capstone project for Brandon Slade - programmatic navigation demo",
+    "description": "Capstone project for Brandon Slade - heavy bundle demo",
     "author": {
         "name": "Brandon Slade",
         "email": "brandonyoyoslade@gmail.com",
@@ -14,7 +14,7 @@
         "test": "yarn test-once -q",
         "build": "npm run clean-dist -q && webpack --config ./config/webpack/development.js --colors --progress --display-error-details --display-cached",
         "watch": "npm run clean-dist -q && webpack --config ./config/webpack/development.js --colors --progress --display-error-details --display-cached --watch",
-        "serve": "http-server dist -p 8085 --push-state",
+        "serve": "http-server dist -p 8086 --push-state",
         "clean-dist": "rimraf dist && npm run copy-assets -q",
         "copy-assets": "cpr public dist"
     },
