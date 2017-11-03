@@ -1,0 +1,66 @@
+{
+    "name": "@aboveyou00/dependency-loader-visualizer-2",
+    "version": "0.0.0",
+    "description": "Capstone project for Brandon Slade - dependency loader visualizer - second iteration",
+    "author": {
+        "name": "Brandon Slade",
+        "email": "brandonyoyoslade@gmail.com",
+        "url": "http://www.bestoflies.com/"
+    },
+    "scripts": {
+        "travis": "bash ./scripts/travis.sh",
+        "test-watch": "mocha-typescript-watch -p tsconfig.json \"dist/**/*.spec.js\"",
+        "test-once": "mocha --require ts-node/register \"src/**/*.spec.ts\"",
+        "test": "yarn test-once -q",
+        "build": "npm run clean-dist -q && webpack --config ./config/webpack/development.js --colors --progress --display-error-details --display-cached",
+        "watch": "npm run clean-dist -q && webpack --config ./config/webpack/development.js --colors --progress --display-error-details --display-cached --watch",
+        "serve": "http-server dist -p 8087 -c-1",
+        "clean-dist": "rimraf dist && npm run copy-assets -q",
+        "copy-assets": "cpr public dist"
+    },
+    "devDependencies": {
+        "@types/chai": "^3.4.35",
+        "@types/chai-as-promised": "^0.0.30",
+        "@types/mocha": "^2.2.40",
+        "@types/sinon": "^2.1.1",
+        "@types/sinon-chai": "^2.7.27",
+        "chai": "^3.5.0",
+        "chai-as-promised": "^6.0.0",
+        "cpr": "^2.2.0",
+        "http-server": "^0.10.0",
+        "istanbul": "^0.4.5",
+        "lodash": "^4.17.4",
+        "mocha": "^3.2.0",
+        "mocha-typescript": "^1.0.23",
+        "remap-istanbul": "^0.9.5",
+        "rimraf": "^2.6.2",
+        "sinon": "^2.1.0",
+        "sinon-chai": "^2.10.0",
+        "ts-node": "^3.0.4",
+        "tslint": "^4.5.1"
+    },
+    "dependencies": {
+        "@aboveyou00/capstone-router": "^0.1.0",
+        "@types/core-js": "^0.9.43",
+        "@types/lodash.merge": "^4.6.3",
+        "awesome-typescript-loader": "^3.2.3",
+        "config": "^1.26.2",
+        "node-sass": "^4.5.3",
+        "rxjs": "^5.5.0",
+        "sass-loader": "^6.0.6",
+        "style-loader": "^0.19.0",
+        "trim-loader": "^0.5.1",
+        "typescript": "^2.5.3",
+        "webpack": "^3.7.1",
+        "webpack-merge": "^4.1.0"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/blslade-neumont/capstone-spa-router.git"
+    },
+    "bugs": {
+        "url": "https://github.com/blslade-neumont/capstone-spa-router/issues"
+    },
+    "homepage": "https://github.com/blslade-neumont/capstone-spa-router#readme"
+}

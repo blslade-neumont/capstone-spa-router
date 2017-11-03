@@ -12,6 +12,7 @@ before_script:
   - cd router-demo && yarn && cd ..
   - cd programmatic-navigation-demo && yarn && cd ..
   - cd heavy-bundle-demo && yarn && cd ..
+  - cd dependency-loader-visualizer-2 && yarn && cd ..
 
 script:
   - yarn travis -q

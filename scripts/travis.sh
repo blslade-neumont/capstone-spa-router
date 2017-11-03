@@ -17,5 +17,6 @@ cd dependency-loader-visualizer && yarn travis && cd ..
 cd router-demo && yarn travis && cd ..
 cd programmatic-navigation-demo && yarn travis && cd ..
 cd heavy-bundle-demo && yarn travis && cd ..
+cd dependency-loader-visualizer-2 && yarn travis && cd ..
 
 exit 0
