@@ -13,6 +13,23 @@ let dependencyGridContainer = document.getElementById('dependencyGrid');
 let dependencyContentName = <HTMLHeadingElement>document.getElementById('dependencyContentName');
 let dependencyContent = <HTMLPreElement>document.getElementById('dependencyContent');
 
+let canvas: HTMLCanvasElement;
+let context: CanvasRenderingContext2D;
+let renderFn: () => void;
+
+function redrawCanvas() {
+    if (canvas) {
+        canvas.width = canvas.scrollWidth;
+        canvas.height = canvas.scrollHeight;
+        context.fillStyle = 'white';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        if (renderFn) renderFn();
+    }
+}
+window.addEventListener('resize', () => {
+    redrawCanvas();
+});
+
 function createVisualizer(dependencyLoader: DependencyLoader) {
     dependencyLoader.events.subscribe(e => {
         let elements: HTMLCollectionOf<Element>;
@@ -27,7 +44,6 @@ function createVisualizer(dependencyLoader: DependencyLoader) {
             break;
             
         case 'resource-load-begin':
-            console.log('resource load begin event:', e);
             className = e.path.replace('/', '__SLASH__');
             elements = document.getElementsByClassName(`srcref-${className}`);
             for (let q = 0; q < elements.length; q++) {
@@ -40,7 +56,6 @@ function createVisualizer(dependencyLoader: DependencyLoader) {
             break;
             
         case 'resource-load-end':
-            console.log('resource load end event', e);
             className = e.path.replace('/', '__SLASH__');
             elements = document.getElementsByClassName(`srcref-${className}`);
             for (let q = 0; q < elements.length; q++) {
@@ -121,6 +136,7 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
     let rowMap = new Map<string, number>();
     let placementMap = new Map<string, boolean>();
     let nextAvailableGen0 = 0;
+    let maxRow = 0;
     for (let gen = maxGeneration; gen >= 0; gen--) {
         console.log(`Emplacing generation ${gen}...`);
         let unplaced = (unplacedMap.has(gen) && unplacedMap.get(gen)) || [];
@@ -135,6 +151,7 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
         let row = lastRowFromDeps(dep);
         row = findNextAvailableSlot(gen, row);
         rowMap.set(name, row);
+        if (row > maxRow) maxRow = row;
         let unplaced = unplacedMap.get(gen);
         let idx = unplaced.indexOf(name);
         unplaced.splice(idx, 1);
@@ -178,6 +195,13 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
     dependencyWrapper.style['grid-template-columns'] = `${maxGeneration + 2}`;
     dependencyGridContainer.appendChild(dependencyWrapper);
     
+    canvas = document.createElement('canvas');
+    canvas.style['grid-row'] = `1 / ${2 + Math.max(maxRow, networkResources.length)}`;
+    canvas.style['grid-column'] = `1 / ${maxGeneration + 3}`;
+    canvas.style['z-index'] = '-1';
+    context = canvas.getContext('2d');
+    dependencyWrapper.appendChild(canvas);
+    
     let networkDepLabel = document.createElement('h4');
     networkDepLabel.innerHTML = 'Network Dependencies';
     networkDepLabel.style['grid-row'] = '1';
@@ -190,6 +214,7 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
     logicalDepLabel.style['grid-column'] = `2 / ${maxGeneration + 3}`;
     dependencyWrapper.appendChild(logicalDepLabel);
     
+    let networkResourceBtnMap = new Map<string, HTMLButtonElement>();
     for (let q = 0; q < networkResources.length; q++) {
         let source = networkResources[q];
         let resourceBtn = document.createElement('button');
@@ -200,8 +225,10 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
         resourceBtn.innerHTML = source;
         resourceBtn.classList.add(`srcref-${source.replace('/', '__SLASH__')}`);
         dependencyWrapper.appendChild(resourceBtn);
+        networkResourceBtnMap.set(source, resourceBtn);
     }
     
+    let dependencyBtnMap = new Map<string, HTMLButtonElement>();
     for (let dep of dependencies) {
         let depBtn = document.createElement('button');
         let row = rowMap.get(dep.name);
@@ -213,7 +240,38 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
         depBtn.classList.add(`btnref-${dep.name}`);
         depBtn.addEventListener('click', async () => displayContent(dep.name, await dependencyLoader.get(dep.name)));
         dependencyWrapper.appendChild(depBtn);
+        dependencyBtnMap.set(dep.name, depBtn);
     }
+    
+    renderFn = () => {
+        context.strokeStyle = 'yellow';
+        context.lineWidth = 1.5;
+        context.beginPath();
+        for (let dep of dependencies) {
+            let rightBtn = dependencyBtnMap.get(dep.name);
+            let leftBtn = networkResourceBtnMap.get(dep.src);
+            context.moveTo(rightBtn.offsetLeft - 5, rightBtn.offsetTop + (rightBtn.offsetHeight / 2));
+            context.lineTo(leftBtn.offsetLeft + leftBtn.offsetWidth + 5, leftBtn.offsetTop + (leftBtn.offsetHeight / 2));
+        }
+        context.stroke();
+        
+        context.strokeStyle = 'green';
+        context.lineWidth = 3;
+        context.lineCap = 'arrow';
+        context.beginPath();
+        for (let dep of dependencies) {
+            let rightBtn = dependencyBtnMap.get(dep.name);
+            if (dep.type == 'script') {
+                for (let dep2 of (dep.deps || [])) {
+                    let leftBtn = dependencyBtnMap.get(dep2);
+                    context.moveTo(rightBtn.offsetLeft - 5, rightBtn.offsetTop + (rightBtn.offsetHeight / 2));
+                    context.lineTo(leftBtn.offsetLeft + leftBtn.offsetWidth + 5, leftBtn.offsetTop + (leftBtn.offsetHeight / 2));
+                }
+            }
+        }
+        context.stroke();
+    };
+    redrawCanvas();
 }
 
 function displayContent(name: string, content: any) {
