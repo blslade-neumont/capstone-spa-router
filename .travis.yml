@@ -2,6 +2,18 @@ language: node_js
 node_js:
   - '7'
 
+cache:
+  directories:
+  - capstone-router/node_modules
+  - dep-loader-spike/node_modules
+  - dependency-loader-visualizer/node_modules
+  - dependency-loader-visualizer-2/node_modules
+  - heavy-bundle-demo/node_modules
+  - launchpad/node_modules
+  - programmatic-navigation-demo/node_modules
+  - router-demo/node_modules
+  - router-spike/node_modules
+
 before_script:
   - yarn
   - cd router-spike && yarn && cd ..
