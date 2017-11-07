@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@aboveyou00/capstone-router@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@aboveyou00/capstone-router/-/capstone-router-0.1.2.tgz#4850319befd41b7bc00ce85b82ebf98f7c40c95b"
+"@aboveyou00/capstone-router@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@aboveyou00/capstone-router/-/capstone-router-0.1.3.tgz#c6167541755afff0df818865e7252c9ef3484b03"
   dependencies:
     "@types/core-js" "^0.9.43"
 

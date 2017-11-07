@@ -16,13 +16,40 @@ let dependencyContent = <HTMLPreElement>document.getElementById('dependencyConte
 function createVisualizer(dependencyLoader: DependencyLoader) {
     dependencyLoader.events.subscribe(e => {
         let elements: HTMLCollectionOf<Element>;
+        let className: string;
         switch (e.type) {
         case 'schema-added':
             if (schemaLoadingMsg) {
                 schemaLoadingMsg.parentElement.removeChild(schemaLoadingMsg);
                 schemaLoadingMsg = null;
             }
-            addLogicalDependencies(dependencyLoader, e.added);
+            addDependencies(dependencyLoader, e.added);
+            break;
+            
+        case 'resource-load-begin':
+            console.log('resource load begin event:', e);
+            className = e.path.replace('/', '__SLASH__');
+            elements = document.getElementsByClassName(`srcref-${className}`);
+            for (let q = 0; q < elements.length; q++) {
+                let el = elements[q];
+                if (!(el instanceof HTMLButtonElement)) continue;
+                el.classList.remove('btn-info');
+                el.classList.add('btn-warning');
+                el.disabled = true;
+            }
+            break;
+            
+        case 'resource-load-end':
+            console.log('resource load end event', e);
+            className = e.path.replace('/', '__SLASH__');
+            elements = document.getElementsByClassName(`srcref-${className}`);
+            for (let q = 0; q < elements.length; q++) {
+                let el = elements[q];
+                if (!(el instanceof HTMLButtonElement)) continue;
+                el.classList.remove('btn-warning');
+                el.classList.add('btn-success');
+                el.disabled = false;
+            }
             break;
             
         case 'dep-load-begin':
@@ -31,7 +58,7 @@ function createVisualizer(dependencyLoader: DependencyLoader) {
                 let el = elements[q];
                 if (!(el instanceof HTMLButtonElement)) continue;
                 el.classList.remove('btn-info');
-                el.classList.add('btn-warn');
+                el.classList.add('btn-warning');
                 el.disabled = true;
             }
             break;
@@ -41,7 +68,7 @@ function createVisualizer(dependencyLoader: DependencyLoader) {
             for (let q = 0; q < elements.length; q++) {
                 let el = elements[q];
                 if (!(el instanceof HTMLButtonElement)) continue;
-                el.classList.remove('btn-warn');
+                el.classList.remove('btn-warning');
                 el.classList.add('btn-success');
                 el.disabled = false;
             }
@@ -50,11 +77,12 @@ function createVisualizer(dependencyLoader: DependencyLoader) {
     });
 }
 
-function addLogicalDependencies(dependencyLoader: DependencyLoader, dependencies: SchemaT) {
+function addDependencies(dependencyLoader: DependencyLoader, dependencies: SchemaT) {
     let depMap = new Map<string, SchemaEntryT>();
     for (let dep of dependencies) {
         depMap.set(dep.name, dep);
     }
+    let networkResources = [...new Set(dependencies.map(dep => dep.src))];
     console.log(`Adding logical dependencies: [${dependencies.map(dep => dep.name).map(name => `'${name}'`).join(', ')}]`);
     let generationMap = new Map<string, number>();
     let unplacedMap = new Map<number, string[]>();
@@ -161,6 +189,18 @@ function addLogicalDependencies(dependencyLoader: DependencyLoader, dependencies
     logicalDepLabel.style['grid-row'] = '1';
     logicalDepLabel.style['grid-column'] = `2 / ${maxGeneration + 3}`;
     dependencyWrapper.appendChild(logicalDepLabel);
+    
+    for (let q = 0; q < networkResources.length; q++) {
+        let source = networkResources[q];
+        let resourceBtn = document.createElement('button');
+        resourceBtn.style['grid-row'] = `${2 + q}`;
+        resourceBtn.style['grid-column'] = '1';
+        resourceBtn.disabled = true;
+        resourceBtn.classList.add('btn', 'btn-info', 'network-resource');
+        resourceBtn.innerHTML = source;
+        resourceBtn.classList.add(`srcref-${source.replace('/', '__SLASH__')}`);
+        dependencyWrapper.appendChild(resourceBtn);
+    }
     
     for (let dep of dependencies) {
         let depBtn = document.createElement('button');
