@@ -45,7 +45,7 @@ export class NetworkDependencyLoader extends DependencyLoader {
             this.eventsSubject.next({
                 type: 'resource-load-begin',
                 resourceType: 'text',
-                name: name
+                path: path
             });
             let req = new XMLHttpRequest();
             req.onreadystatechange = function(this: XMLHttpRequest, e: Event) {
@@ -63,7 +63,7 @@ export class NetworkDependencyLoader extends DependencyLoader {
             this.eventsSubject.next({
                 type: 'resource-load-end',
                 resourceType: 'text',
-                name: name
+                path: path
             });
             return;
         }
@@ -84,7 +84,7 @@ export class NetworkDependencyLoader extends DependencyLoader {
             this.eventsSubject.next({
                 type: 'resource-load-begin',
                 resourceType: 'script',
-                name: name
+                path: path
             });
             let script = document.createElement('script');
             script.src = path;
@@ -109,7 +109,7 @@ export class NetworkDependencyLoader extends DependencyLoader {
             this.eventsSubject.next({
                 type: 'resource-load-end',
                 resourceType: 'script',
-                name: name
+                path: path
             });
         }
         await resource.loadPromise;

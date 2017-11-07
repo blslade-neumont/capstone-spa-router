@@ -3,12 +3,12 @@ import { SchemaT } from './schema';
 export interface ResourceLoadBeginEventT {
     type: 'resource-load-begin',
     resourceType: 'text' | 'script',
-    name: string
+    path: string
 }
 export interface ResourceLoadEndEventT {
     type: 'resource-load-end',
     resourceType: 'text' | 'script',
-    name: string
+    path: string
 }
 export interface DependencyLoadBeginEventT {
     type: 'dep-load-begin',
