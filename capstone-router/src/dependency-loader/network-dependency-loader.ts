@@ -42,6 +42,11 @@ export class NetworkDependencyLoader extends DependencyLoader {
                 content: void(0)
             };
             this.resources.set(path, resource);
+            this.eventsSubject.next({
+                type: 'resource-load-begin',
+                resourceType: 'text',
+                name: name
+            });
             let req = new XMLHttpRequest();
             req.onreadystatechange = function(this: XMLHttpRequest, e: Event) {
                 if (this.readyState !== XMLHttpRequest.DONE) return;
@@ -54,8 +59,15 @@ export class NetworkDependencyLoader extends DependencyLoader {
             }
             req.open('GET', path);
             req.send();
+            await resource.loadPromise;
+            this.eventsSubject.next({
+                type: 'resource-load-end',
+                resourceType: 'text',
+                name: name
+            });
+            return;
         }
-        return void(await resource.loadPromise);
+        await resource.loadPromise;
     }
     private async executeScriptResource(path: string) {
         let resource: ScriptResourceT = <any>this.resources.get(path);
@@ -69,6 +81,11 @@ export class NetworkDependencyLoader extends DependencyLoader {
                 loadPromise: promise
             };
             this.resources.set(path, resource);
+            this.eventsSubject.next({
+                type: 'resource-load-begin',
+                resourceType: 'script',
+                name: name
+            });
             let script = document.createElement('script');
             script.src = path;
             document.head.appendChild(script);
@@ -88,8 +105,14 @@ export class NetworkDependencyLoader extends DependencyLoader {
                     resolveFn();
                 };
             }
+            await resource.loadPromise;
+            this.eventsSubject.next({
+                type: 'resource-load-end',
+                resourceType: 'script',
+                name: name
+            });
         }
-        return void(await resource.loadPromise);
+        await resource.loadPromise;
     }
     
     async loadSchema(path: string): Promise<void> {
@@ -133,8 +156,10 @@ export class NetworkDependencyLoader extends DependencyLoader {
             break;
             
         case "script":
-            await this.executeScriptResource(meta.src);
-            let deps = await Promise.all((meta.deps || []).map(this.get.bind(this)));
+            let depNames = meta.deps || [];
+            let allPromises = depNames.map(name => this.get<any>(name));
+            allPromises.push(this.executeScriptResource(meta.src));
+            let deps = (await Promise.all(allPromises)).slice(0, depNames.length);
             let fn = this._global[meta.methodName];
             if (typeof fn !== 'function') throw new Error(`Content '${meta.name}' uses methodName ${meta.methodName}, which is not a function`);
             content = await fn(...deps);

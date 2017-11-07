@@ -19,10 +19,12 @@ describe('NetworkDependencyLoader', () => {
         
         describe('.loadContentResource', () => {
             //TODO: add network integration tests
+            //TODO: add resource load event unit tests
         });
         
         describe('.executeScriptResource', () => {
             //TODO: add network integration tests
+            //TODO: add resource load event unit tests
         });
         
         describe('.loadSchema', () => {
@@ -208,6 +210,21 @@ describe('NetworkDependencyLoader', () => {
                     (<any>window).dl_func2 = function(first: number) { return first + 1; };
                     let result = await (<any>inst).getContentImpl(scriptDepContent.name);
                     expect(result).toBe(43);
+                    delete (<any>window).dl_func;
+                    delete (<any>window).dl_func2;
+                });
+                it('should fetch script dependencies without waiting for the script network resource', async () => {
+                    let event = {
+                        scriptResourceLoaded: () => void(0)
+                    };
+                    (<any>inst).resources.set(scriptContent.src, { loadPromise: delay(100).then(() => event.scriptResourceLoaded()), isLoaded: true, isContent: false });
+                    (<any>window).dl_func = function() { return 42; };
+                    (<any>window).dl_func2 = function(first: number) { return first + 1; };
+                    spyOn(inst, 'get');
+                    spyOn(event, 'scriptResourceLoaded');
+                    let result = await (<any>inst).getContentImpl(scriptDepContent.name);
+                    expect(inst.get).toHaveBeenCalledWith('script');
+                    expect(inst.get).toHaveBeenCalledBefore(<any>event.scriptResourceLoaded);
                     delete (<any>window).dl_func;
                     delete (<any>window).dl_func2;
                 });

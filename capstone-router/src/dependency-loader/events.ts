@@ -1,5 +1,15 @@
 import { SchemaT } from './schema';
 
+export interface ResourceLoadBeginEventT {
+    type: 'resource-load-begin',
+    resourceType: 'text' | 'script',
+    name: string
+}
+export interface ResourceLoadEndEventT {
+    type: 'resource-load-end',
+    resourceType: 'text' | 'script',
+    name: string
+}
 export interface DependencyLoadBeginEventT {
     type: 'dep-load-begin',
     name: string
@@ -23,7 +33,9 @@ export interface SchemaAddedEventT {
     added: SchemaT
 }
 
-export type DependencyLoaderEventT = DependencyLoadBeginEventT
+export type DependencyLoaderEventT = ResourceLoadBeginEventT
+                                   | ResourceLoadEndEventT
+                                   | DependencyLoadBeginEventT
                                    | DependencyLoadEndEventT
                                    | SchemaLoadBeginEventT
                                    | SchemaLoadEndEventT
