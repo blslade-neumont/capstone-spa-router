@@ -188,6 +188,7 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
     console.log(`Creating grid...`);
     let gridHeader = document.createElement('h1');
     gridHeader.innerText = 'Dependency Grid';
+    gridHeader.classList.add('mt-2');
     dependencyGridContainer.appendChild(gridHeader);
     
     let dependencyWrapper = document.createElement('div');
