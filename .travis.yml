@@ -11,11 +11,11 @@ cache:
   - heavy-bundle-demo/node_modules
   - launchpad/node_modules
   - programmatic-navigation-demo/node_modules
+  - route-parameter-demo/node_modules
   - router-demo/node_modules
   - router-spike/node_modules
 
 before_script:
-  - yarn
   - cd router-spike && yarn && cd ..
   - cd dep-loader-spike && yarn && cd ..
   - cd capstone-router && yarn && cd ..
@@ -25,6 +25,7 @@ before_script:
   - cd programmatic-navigation-demo && yarn && cd ..
   - cd heavy-bundle-demo && yarn && cd ..
   - cd dependency-loader-visualizer-2 && yarn && cd ..
+  - cd route-parameter-demo && yarn && cd ..
 
 script:
   - yarn travis -q

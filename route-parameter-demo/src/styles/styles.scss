@@ -1,0 +1,28 @@
+
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.path-hint {
+    font-size: smaller;
+    opacity: .5;
+    margin-left: 1em;
+    
+    &:before {
+        content: '(';
+    }
+    &:after {
+        content: ')';
+    }
+}
+
+#navigationHistory > * {
+    display: block;
+    margin: 4px 8px;
+}
