@@ -26,3 +26,20 @@ body {
     display: block;
     margin: 4px 8px;
 }
+
+.fish {
+    font-size: 120px;
+    display: block;
+    text-align: center;
+    filter: grayscale(100%);
+    transform: scaleX(-1);
+    
+    &.fish-red {
+        color: red;
+        filter: hue-rotate(160deg);
+    }
+    &.fish-blue {
+        color: blue;
+        filter: none;
+    }
+}
