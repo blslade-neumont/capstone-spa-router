@@ -225,56 +225,6 @@ describe('Router', () => {
             await inst.navigateTo(routes[0].path);
             expect(navs[1]).toEqual([[routes[0]], routes[0].path, true]);
         });
-        it('should not start a navigation if the route is identical to the previous route', async () => {
-            let navs: any[] = [];
-            let subscription = (<any>inst)._navigationObservable.subscribe(vals => navs.push(vals));
-            let routes = cloneDeep(tripleRoutes);
-            await inst.loadRoutes(routes);
-            await delay(0);
-            await inst.navigateTo(routes[0].path);
-            await inst.navigateTo(routes[0].path);
-            expect(navs[1]).toEqual([[routes[0]], routes[0].path, true]);
-            expect(navs[2]).toBeUndefined();
-        });
-    });
-    
-    describe('.areSameNavigation', () => {
-        let fn: (lhs: [any[] | null, string], rhs: [any[] | null, string]) => boolean;
-        beforeEach(() => {
-            fn = (<any>inst).areSameNavigation.bind(inst);
-        });
-        
-        describe('when both routes are not found', () => {
-            it('should return true if both paths are the same', () => {
-                expect(fn([null, '/abc'], [null, '/abc'])).toBe(true);
-            });
-            it('should return false if the paths are different', () => {
-                expect(fn([null, '/abc'], [null, '/xyz'])).toBe(false);
-            });
-        });
-        
-        describe('when only one route is not found', () => {
-            it('should return false', () => {
-                expect(fn([[{}], '/abc'], [null, '/abc'])).toBe(false);
-                expect(fn([null, '/abc'], [[{}], '/abc'])).toBe(false);
-            });
-        });
-        
-        describe('when both routes are found', () => {
-            const segs = [{ a: 'a' }, { b: 'b' }, { c: 'c' }];
-            
-            it('should return false if any of the segments are not the same', () => {
-                expect(fn([[segs[0]], '/abc'], [[segs[0], segs[1]], '/abc'])).toBe(false);
-                expect(fn([[segs[0], segs[1]], '/abc'], [[segs[0]], '/abc'])).toBe(false);
-                expect(fn([[segs[0], segs[1]], '/abc'], [[segs[1], segs[0]], '/abc'])).toBe(false);
-            });
-            it('should return true if all of the segments are the same', () => {
-                expect(fn([[segs[0]], '/abc'], [[segs[0]], '/abc'])).toBe(true);
-                expect(fn([[...segs], '/abc'], [[...segs], '/abc'])).toBe(true);
-                expect(fn([[segs[0]], '/abc'], [[segs[0]], '/xyz'])).toBe(true);
-                expect(fn([[...segs], '/abc'], [[...segs], '/xyz'])).toBe(true);
-            });
-        });
     });
     
     describe('.loadRouteTemplates', () => {

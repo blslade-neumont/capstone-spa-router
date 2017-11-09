@@ -2,7 +2,6 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/distinctUntilChanged';
 import { DependencyLoader, NetworkDependencyLoader } from '../dependency-loader';
 import { PlatformAdapter } from './platform-adapter';
 import { BrowserPlatformAdapter } from './browser-platform-adapter';
@@ -15,8 +14,7 @@ export class Router {
         private platform: PlatformAdapter = new BrowserPlatformAdapter()
     ) {
         this._navigationObservable = this._navigationSubject
-            .asObservable()
-            .distinctUntilChanged((lhs, rhs) => this.areSameNavigation(lhs, rhs));
+            .asObservable();
         this._currentRoute = this._navigationObservable
             .map(([route]) => route);
         
@@ -140,19 +138,6 @@ export class Router {
         let path = segments.join('/');
         if (!path.startsWith('/')) path = '/' + path;
         this._navigationSubject.next([newRoute, path, pushState]);
-    }
-    private areSameNavigation(lhs: [RouteEntryT[] | null, string, boolean], rhs: [RouteEntryT[] | null, string, boolean]) {
-        let leftRoutes = lhs[0];
-        let rightRoutes = rhs[0];
-        if (!leftRoutes || !rightRoutes) {
-            if (!leftRoutes && !rightRoutes) return lhs[1] === rhs[1];
-            return false;
-        }
-        if (leftRoutes.length !== rightRoutes.length) return false;
-        for (let q = 0; q < leftRoutes.length; q++) {
-            if (leftRoutes[q] !== rightRoutes[q]) return false;
-        }
-        return true;
     }
     
     async loadRouteTemplates(route: RouteEntryT[] | null, path: string): Promise<[string, string]> {
