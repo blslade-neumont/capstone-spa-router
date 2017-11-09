@@ -27,6 +27,10 @@ export class MockElement extends EventEmitter {
         this.children.splice(idx, 0, newChild);
         newChild.parentNode = newChild.parentElement = this;
     }
+    
+    querySelector(selector: string) {
+        return null;
+    }
 }
 
 export class MockDocument extends EventEmitter {

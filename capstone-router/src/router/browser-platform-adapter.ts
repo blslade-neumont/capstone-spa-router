@@ -107,7 +107,10 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
         }
         this._outlet.innerHTML = tpl;
         this._document.title = title;
+        let autofocusElement = this._outlet.querySelector('[autofocus]') || null;
+        if (autofocusElement && typeof (<any>autofocusElement).focus === 'function') (<any>autofocusElement).focus();
         if (pushState) this._window.scrollTo(0, 0);
+        
         this.eventsSubject.next({
             type: 'end',
             route: route,

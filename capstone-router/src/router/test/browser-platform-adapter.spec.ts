@@ -271,6 +271,15 @@ describe('BrowserPlatformAdapter', () => {
                     await inst.performNavigation([], '', true, false);
                     expect(_document.title).toBe('title');
                 });
+                it(`should call focus on the first element with an autofocus attribute in the route template`, async () => {
+                    let outlet = (<any>inst)._outlet;
+                    let autofocusEl = { focus: function() { } };
+                    spyOn(outlet, 'querySelector').and.returnValue(autofocusEl);
+                    spyOn(autofocusEl, 'focus');
+                    await inst.performNavigation([], '', true, false);
+                    expect((<any>inst)._outlet.innerHTML).toBe('tpl');
+                    expect(autofocusEl.focus).toHaveBeenCalled();
+                });
                 it(`should call history.pushState if pushState is true`, async () => {
                     spyOn(_history, 'pushState');
                     (<any>_document).location = { protocol: 'http:', host: 'localhost:8080', pathname: '/' };
