@@ -1,0 +1,53 @@
+{
+    "$schema": "../node_modules/@aboveyou00/capstone-router/schema/router-dependencies.json",
+    "routes": [
+        {"path": "", "template": { "dep": "layout-tpl" }, "children": [
+            {"path": "/", "title": "Capstone Presentation", "template": { "dep": "home-tpl" }},
+            {"path": "problem-definition", "title": "Problem Definition", "template": "", "children": [
+                {"path": "", "template": {"dep": "pd-typical-workflow-tpl"}},
+                {"path": "spa", "template": {"dep": "pd-spa-workflow-tpl"}},
+                {"path": "capstone", "template": {"dep": "pd-capstone-workflow-tpl"}}
+            ]},
+            {"path": "dependency-loader", "title": "Dependency Loader", "template": { "dep": "dependency-loader-tpl" }},
+            {"path": "router", "title": "Router", "template": { "dep": "router-tpl" }},
+            {"path": "**", "title": "Not Found: ROUTE-PARAM:**", "template": { "dep": "not-found-tpl" }}
+        ]}
+    ],
+    "content": [{
+        "name": "routes",
+        "type": "text",
+        "src": "/router-dependencies.json"
+    }, {
+        "name": "layout-tpl",
+        "type": "text",
+        "src": "/templates/layout.tpl.html"
+    }, {
+        "name": "home-tpl",
+        "type": "text",
+        "src": "/templates/home.tpl.html"
+    }, {
+        "name": "pd-typical-workflow-tpl",
+        "type": "text",
+        "src": "/templates/problem-definition/typical-workflow.tpl.html"
+    }, {
+        "name": "pd-spa-workflow-tpl",
+        "type": "text",
+        "src": "/templates/problem-definition/spa-workflow.tpl.html"
+    }, {
+        "name": "pd-capstone-workflow-tpl",
+        "type": "text",
+        "src": "/templates/problem-definition/capstone-spa-workflow.tpl.html"
+    }, {
+        "name": "dependency-loader-tpl",
+        "type": "text",
+        "src": "/templates/dependency-loader.tpl.html"
+    }, {
+        "name": "router-tpl",
+        "type": "text",
+        "src": "/templates/router.tpl.html"
+    }, {
+        "name": "not-found-tpl",
+        "type": "text",
+        "src": "/templates/not-found.tpl.html"
+    }]
+}

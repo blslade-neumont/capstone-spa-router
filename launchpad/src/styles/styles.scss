@@ -13,3 +13,190 @@ body {
     max-width: 100%;
     border: 1px solid rgba(0, 0, 0, .2);
 }
+
+.computer-animation-wrapper {
+    position: absolute;
+    width: 100vw;
+    height: calc(100vh - 56px);
+    text-align: center;
+    
+    &.typical {
+        & .request {
+            animation-name: typical-request;
+            animation-duration: 5s;
+            animation-iteration-count: infinite;
+        }
+        & .response {
+            animation-name: typical-response;
+            animation-duration: 5s;
+            animation-iteration-count: infinite;
+        }
+    }
+    &.spa {
+        & .request {
+            animation-name: spa-request;
+            animation-duration: 5s;
+            animation-iteration-count: 1;
+            left: 420px;
+            top: calc(50vh - 50px);
+        }
+        & .response {
+            animation-name: spa-response;
+            animation-duration: 30s;
+            animation-iteration-count: 1;
+            left: calc(100vw - 370px);
+            top: calc(50vh - 130px);
+        }
+    }
+    &.capstone-spa {
+        & .request {
+            animation-name: typical-request;
+            animation-duration: 5s;
+            left: 420px;
+            top: calc(50vh - 50px);
+        }
+        & .response {
+            animation-name: typical-response;
+            animation-duration: 5s;
+            left: calc(100vw - 370px);
+            top: calc(50vh - 130px);
+        }
+    }
+    
+    & h1 {
+        margin-top: 20vh;
+    }
+    & .computer-left {
+        position: absolute;
+        left: 120px;
+        top: calc(50vh - 150px);
+    }
+    & .computer-right {
+        position: absolute;
+        right: 120px;
+        top: calc(50vh - 150px);
+    }
+    & .request {
+        position: absolute;
+        font-size: 120px;
+        transform: rotate(20deg);
+        animation-timing-function: linear;
+    }
+    & .response {
+        position: absolute;
+        font-size: 80px;
+        transform: rotate(-20deg);
+        animation-timing-function: linear;
+    }
+}
+
+@keyframes typical-request {
+    0% {
+        left: calc(100vw - 350px);
+        top: calc(50vh - 150px);
+    }
+    10% {
+        left: calc(100vw - 350px);
+        top: calc(50vh - 150px);
+    }
+    45% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+    100% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+}
+@keyframes typical-response {
+    0% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+    55% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+    90% {
+        left: calc(100vw - 370px);
+        top: calc(50vh - 130px);
+    }
+    100% {
+        left: calc(100vw - 370px);
+        top: calc(50vh - 130px);
+    }
+}
+
+@keyframes spa-request {
+    0% {
+        left: calc(100vw - 350px);
+        top: calc(50vh - 150px);
+    }
+    10% {
+        left: calc(100vw - 350px);
+        top: calc(50vh - 150px);
+    }
+    45% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+    100% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+}
+@keyframes spa-response {
+    0% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+    12% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+    90% {
+        left: calc(100vw - 370px);
+        top: calc(50vh - 130px);
+    }
+    100% {
+        left: calc(100vw - 370px);
+        top: calc(50vh - 130px);
+    }
+}
+
+@keyframes capstone-request {
+    0% {
+        left: calc(100vw - 350px);
+        top: calc(50vh - 150px);
+    }
+    10% {
+        left: calc(100vw - 350px);
+        top: calc(50vh - 150px);
+    }
+    45% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+    100% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+}
+@keyframes capstone-response {
+    0% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+    55% {
+        left: 420px;
+        top: calc(50vh - 50px);
+    }
+    90% {
+        left: calc(100vw - 370px);
+        top: calc(50vh - 130px);
+    }
+    100% {
+        left: calc(100vw - 370px);
+        top: calc(50vh - 130px);
+    }
+}

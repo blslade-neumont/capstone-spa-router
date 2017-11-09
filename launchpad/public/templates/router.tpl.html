@@ -1,87 +1,89 @@
-<div class="row mt-4">
-    <div class="col-12">
-        <h1>Single-Page Application Router</h1>
+<div class="container">
+    <div class="row mt-4">
+        <div class="col-12">
+            <h1>Single-Page Application Router</h1>
+        </div>
     </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-md-4">
-        <img src="/thumbnails/router-demo.png" class="demo-thumbnail" />
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <img src="/thumbnails/router-demo.png" class="demo-thumbnail" />
+        </div>
+        <div class="col-md-8">
+            <h2><a href="http://localhost:8084" target="_blank">Simple Demo Application</a></h2>
+            <p>
+                A simple web-application with a few static pages.
+                This is the first demo site I created, with little or no concern for advanced functionality.
+                The pages contain primarily text-based templates.
+                None of the routes are dynamic in any way.
+                The "Page Not Found" route was retrofitted after it was intially added to the capstone router.
+            </p>
+        </div>
     </div>
-    <div class="col-md-8">
-        <h2><a href="http://localhost:8084" target="_blank">Simple Demo Application</a></h2>
-        <p>
-            A simple web-application with a few static pages.
-            This is the first demo site I created, with little or no concern for advanced functionality.
-            The pages contain primarily text-based templates.
-            None of the routes are dynamic in any way.
-            The "Page Not Found" route was retrofitted after it was intially added to the capstone router.
-        </p>
-    </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-md-4">
-        <img src="/thumbnails/programmatic-navigation.png" class="demo-thumbnail" />
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <img src="/thumbnails/programmatic-navigation.png" class="demo-thumbnail" />
+        </div>
+        <div class="col-md-8">
+            <h2><a href="http://localhost:8085" target="_blank">Programmatic Navigation (With 404)</a></h2>
+            <p>
+                A test bed created to showcase programmatic page navigation,
+                including routing to a catchall page when a page is not found.
+                Catchall routes can be used for more than just "404 not found" errors.
+                Use the form, table of contents, and history on the left to
+                test each of the routes.
+            </p>
+        </div>
     </div>
-    <div class="col-md-8">
-        <h2><a href="http://localhost:8085" target="_blank">Programmatic Navigation (With 404)</a></h2>
-        <p>
-            A test bed created to showcase programmatic page navigation,
-            including routing to a catchall page when a page is not found.
-            Catchall routes can be used for more than just "404 not found" errors.
-            Use the form, table of contents, and history on the left to
-            test each of the routes.
-        </p>
-    </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-md-4">
-        <img src="/thumbnails/heavy-bundle.png" class="demo-thumbnail" />
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <img src="/thumbnails/heavy-bundle.png" class="demo-thumbnail" />
+        </div>
+        <div class="col-md-8">
+            <h2><a href="http://localhost:8086" target="_blank">Heavy Bundle Simulation</a></h2>
+            <p>
+                A simple static site including both lightweight and heavy pages.
+                Included to showcase the both the lazy-loading and caching of expensive navigation operations.
+                When the user navigates to the pi page, which contains 1,000,000 digits of pi,
+                several megabytes of text are downloaded before the route navigation completes.
+                The next time the user visits the page, the text itself does not need to be
+                downloaded again, although there is still a slight delay for rendering.
+            </p>
+        </div>
     </div>
-    <div class="col-md-8">
-        <h2><a href="http://localhost:8086" target="_blank">Heavy Bundle Simulation</a></h2>
-        <p>
-            A simple static site including both lightweight and heavy pages.
-            Included to showcase the both the lazy-loading and caching of expensive navigation operations.
-            When the user navigates to the pi page, which contains 1,000,000 digits of pi,
-            several megabytes of text are downloaded before the route navigation completes.
-            The next time the user visits the page, the text itself does not need to be
-            downloaded again, although there is still a slight delay for rendering.
-        </p>
-    </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-md-4">
-        <img src="/thumbnails/route-parameter-demo.png" class="demo-thumbnail" />
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <img src="/thumbnails/route-parameter-demo.png" class="demo-thumbnail" />
+        </div>
+        <div class="col-md-8">
+            <h2><a href="http://localhost:8088" target="_blank">Route Parameter Demo</a></h2>
+            <p>
+                A demo using route parameters and and template factories to dynamically construct
+                the template for the page the user has requested.
+                There are actually only three routes defined, although that allows for
+                any number of pages through the use of route parameters.
+                Interfaces with the GitHub API to demonstrate promise-based template factories.
+            </p>
+        </div>
     </div>
-    <div class="col-md-8">
-        <h2><a href="http://localhost:8088" target="_blank">Route Parameter Demo</a></h2>
-        <p>
-            A demo using route parameters and and template factories to dynamically construct
-            the template for the page the user has requested.
-            There are actually only three routes defined, although that allows for
-            any number of pages through the use of route parameters.
-            Interfaces with the GitHub API to demonstrate promise-based template factories.
-        </p>
-    </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <h2>Older Resources</h2>
+    <div class="row mt-4">
+        <div class="col-12">
+            <h2>Older Resources</h2>
+        </div>
     </div>
-</div>
 
-<div class="row mt-2">
-    <div class="col-12">
-        <h4><a href="http://localhost:8082" target="_blank">Synchronous Development Spike</a></h4>
-        <p>
-            This is the proof-of-concept project that I created initially before starting actual development.
-            It is a SPA router that is fully synchronous, using a single bundle for all of the templates rather than
-            loading templates lazily as they are needed.
-        </p>
+    <div class="row mt-2">
+        <div class="col-12">
+            <h4><a href="http://localhost:8082" target="_blank">Synchronous Development Spike</a></h4>
+            <p>
+                This is the proof-of-concept project that I created initially before starting actual development.
+                It is a SPA router that is fully synchronous, using a single bundle for all of the templates rather than
+                loading templates lazily as they are needed.
+            </p>
+        </div>
     </div>
 </div>
