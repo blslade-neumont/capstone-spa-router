@@ -29,17 +29,51 @@ body {
 
 .fish {
     font-size: 120px;
-    display: block;
     text-align: center;
-    filter: grayscale(100%);
-    transform: scaleX(-1);
+    background: rgb(120, 120, 255);
+    margin-top: 40px;
+    padding: 80px 0;
+    position: relative;
+    color: white;
     
-    &.fish-red {
-        color: red;
+    &:after {
+        content: '🐟';
+        display: block;
+        transform: scaleX(-1);
+        filter: saturate(3) hue-rotate(-120deg);
+    }
+    
+    &.fish-two:after {
+        content: '🐟🐟';
+        filter: hue-rotate(-60deg);
+    }
+    &.fish-red:after {
         filter: hue-rotate(160deg);
     }
-    &.fish-blue {
-        color: blue;
+    &.fish-blue:after {
         filter: none;
+    }
+    &.fish-dead {
+        & > * {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            margin-top: -.5em;
+        }
+        &:after {
+            filter: grayscale(100%);
+            transform: translateX(300px) translateY(-320px) rotate(150deg);
+            position: absolute;
+        }
+        &:before {
+            content: "*And it's not because I forgot to feed them.";
+            color: white;
+            font-size: 18px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 80px;
+        }
     }
 }
