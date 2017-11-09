@@ -14,7 +14,7 @@
         "test": "yarn test-once -q",
         "build": "npm run clean-dist -q && webpack --config ./config/webpack/development.js --colors --progress --display-error-details --display-cached",
         "watch": "npm run clean-dist -q && webpack --config ./config/webpack/development.js --colors --progress --display-error-details --display-cached --watch",
-        "serve": "http-server dist -p 8084 --push-state -c-1",
+        "serve": "http-server dist -p 8084 --push-state -c-1 -d false",
         "clean-dist": "rimraf dist && npm run copy-assets -q",
         "copy-assets": "cpr public dist"
     },
