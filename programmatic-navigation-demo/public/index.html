@@ -5,6 +5,7 @@
         <title>Programmatic Navigation Demo</title>
         <link rel="shortcut icon" href="meta/favicon.png" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
@@ -15,18 +16,47 @@
         <script type="text/javascript" src="/scripts/app.bundle.js" async></script>
         <div class="container mt-4">
             <div class="row">
-                <div class="col-md-6">
-                    <h2>Navigate by path</h2>
-                    <div class="form-group">
-                        <label for="path">Router Path</label>
-                        <input type="text" class="form-control" id="pathInput" placeholder="Enter path" />
-                    </div>
-                    <button type="button" id="beginNavigationButton" class="btn btn-primary">Submit</button>
+                <div class="col-md-4">
+                    <h2>Navigate by Path</h2>
+                    <form onsubmit="event.preventDefault(); beginNavigation(event);">
+                        <div class="form-group">
+                            <label for="path">Router Path</label>
+                            <input autofocus="autofocus" type="text" class="form-control" id="pathInput" name="path" placeholder="Enter path" />
+                        </div>
+                        <button type="submit" id="beginNavigationButton" class="btn btn-primary">Submit</button>
+                    </form>
+                    
+                    <h2 class="mt-4">Table of Contents</h2>
+                    <nav>
+                        <ul>
+                            <li><a href="/">Home</a><span class="path-hint">/</span></li>
+                            <li>
+                                Meat
+                                <ul>
+                                    <li><a href="/meat/beef">Beef</a><span class="path-hint">/meat/beef</span></li>
+                                    <li><a href="/meat/pork">Pork</a><span class="path-hint">/meat/pork</span></li>
+                                    <li><a href="/meat/chicken">Chicken</a><span class="path-hint">/meat/chicken</span></li>
+                                    <li><a href="/meat/unicorn">Unicorn (Nonexistant)</a><span class="path-hint">/meat/**</span></li>
+                                </ul>
+                            </li>
+                            <li>
+                                Fish
+                                <ul>
+                                    <li><a href="/fish/one">One Fish</a><span class="path-hint">/fish/one</span></li>
+                                    <li><a href="/fish/two">Two Fish</a><span class="path-hint">/fish/two</span></li>
+                                    <li><a href="/fish/red">Red Fish</a><span class="path-hint">/fish/red</span></li>
+                                    <li><a href="/fish/blue">Blue Fish</a><span class="path-hint">/fish/blue</span></li>
+                                    <li><a href="/fish/fishy">Fishy Fish (Nonexistant)</a><span class="path-hint">/fish/**</span></li>
+                                </ul>
+                            </li>
+                            <li><a href="/hooked-on-phonics">Page Not Found</a><span class="path-hint">/**</span></li>
+                        </ul>
+                    </nav>
                     
                     <h2 class="mt-4">History</h2>
                     <div id="navigationHistory"></div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-8">
                     <router-outlet></router-outlet>
                 </div>
             </div>
