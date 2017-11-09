@@ -1,16 +1,25 @@
-<nav>
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a></li>
-        <li>
-            <a href="/pages">Pages</a>
-            <ul>
-                <li><a href="/pages/1">Page 1</a></li>
-                <li><a href="/pages/2">Page 2</a></li>
-                <li><a href="/pages/3">Page 3</a></li>
-            </ul>
-        </li>
-        <li><a href="/hooked-on-phonics">Page Not Found</a></li>
-    </ul>
-</nav>
-<router-outlet></router-outlet>
+<div class="container">
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <nav>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pages/1">Pages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/hooked-on-phonics">Page Not Found</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="col-md-9">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>
