@@ -1,7 +1,7 @@
 <form class="mt-4 mb-4" onsubmit="event.preventDefault(); orgName=event.target.elements.organizationName.value; if (orgName) navigateTo('/' + orgName);">
     <div class="form-group">
         <label for="exampleInputEmail1">GitHub Organization Name</label>
-        <input type="text" class="form-control" id="inputOrganizationName" name="organizationName">
+        <input autofocus="autofocus" type="text" class="form-control" id="inputOrganizationName" name="organizationName">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
