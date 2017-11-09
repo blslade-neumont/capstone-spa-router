@@ -1,8 +1,14 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema",
-    "title": "Router",
+    "title": "Router Dependencies",
     "type": "object",
     "properties": {
+        "routes": {
+            "type": "array",
+            "items": {
+                "oneOf": [{ "$ref": "definitions.json#/definitions/router-route" }]
+            }
+        },
         "content": {
             "type": "array",
             "items": {
@@ -13,5 +19,5 @@
             }
         }
     },
-    "required": ["content"]
+    "required": ["routes", "content"]
 }

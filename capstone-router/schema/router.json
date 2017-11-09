@@ -6,55 +6,9 @@
         "routes": {
             "type": "array",
             "items": {
-                "oneOf": [{ "$ref": "#/definitions/router-route" }]
+                "oneOf": [{ "$ref": "definitions.json#/definitions/router-route" }]
             }
         }
     },
-    "required": ["router"],
-    "definitions": {
-        "router-route": {
-            "properties": {
-                "path": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "template": {
-                    "oneOf": [
-                        { "type": "string" },
-                        { "$ref": "#/definitions/template-dep" },
-                        { "$ref": "#/definitions/template-factory" }
-                    ]
-                },
-                "children": {
-                    "type": "array",
-                    "items": {
-                        "oneOf": [
-                            { "$ref": "#/definitions/router-route" }
-                        ]
-                    }
-                }
-            },
-            "required": ["path", "template"]
-        },
-        "template-dep": {
-            "type": "object",
-            "properties": {
-                "dep": {
-                    "type": "string"
-                }
-            },
-            "required": ["dep"]
-        },
-        "template-factory": {
-            "type": "object",
-            "properties": {
-                "factory": {
-                    "type": "string"
-                }
-            },
-            "required": ["factory"]
-        }
-    }
+    "required": ["routes"]
 }
