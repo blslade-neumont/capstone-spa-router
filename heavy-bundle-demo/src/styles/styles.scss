@@ -26,3 +26,19 @@ body {
     display: block;
     margin: 4px 8px;
 }
+
+.pi-const {
+    text-align: center;
+    font-size: larger;
+    position: relative;
+    
+    &:before {
+        content: 'π';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0px;
+        font-size: 400px;
+        text-shadow: 0 0 300px blue;
+    }
+}
