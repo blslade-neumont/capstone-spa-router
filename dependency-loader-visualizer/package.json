@@ -40,7 +40,7 @@
         "tslint": "^4.5.1"
     },
     "dependencies": {
-        "@aboveyou00/capstone-router": "^0.1.2",
+        "@aboveyou00/capstone-router": "^0.1.4",
         "@types/core-js": "^0.9.43",
         "@types/lodash.merge": "^4.6.3",
         "awesome-typescript-loader": "^3.2.3",
