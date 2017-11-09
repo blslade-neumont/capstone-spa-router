@@ -28,20 +28,27 @@
         <h2><a href="http://localhost:8085" target="_blank">Programmatic Navigation (With 404)</a></h2>
         <p>
             A test bed created to showcase programmatic page navigation,
-            including routing to a catchall route when a page is not found.
+            including routing to a catchall page when a page is not found.
+            Catchall routes can be used for more than just "404 not found" errors.
+            Use the form, table of contents, and history on the left to
+            test each of the routes.
         </p>
     </div>
 </div>
 
 <div class="row mt-4">
     <div class="col-md-4">
-        <img src="/thumbnails/heavy-bundle-simulation.png" class="demo-thumbnail" />
+        <img src="/thumbnails/heavy-bundle.png" class="demo-thumbnail" />
     </div>
     <div class="col-md-8">
         <h2><a href="http://localhost:8086" target="_blank">Heavy Bundle Simulation</a></h2>
         <p>
-            A simple static site including various lightweight and heavy pages.
+            A simple static site including both lightweight and heavy pages.
             Included to showcase the both the lazy-loading and caching of expensive navigation operations.
+            When the user navigates to the pi page, which contains 1,000,000 digits of pi,
+            several megabytes of text are downloaded before the route navigation completes.
+            The next time the user visits the page, the text itself does not need to be
+            downloaded again, although there is still a slight delay for rendering.
         </p>
     </div>
 </div>
@@ -55,6 +62,8 @@
         <p>
             A demo using route parameters and and template factories to dynamically construct
             the template for the page the user has requested.
+            There are actually only three routes defined, although that allows for
+            any number of pages through the use of route parameters.
             Interfaces with the GitHub API to demonstrate promise-based template factories.
         </p>
     </div>
