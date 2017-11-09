@@ -87,6 +87,9 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
             path: path
         });
         
+        let activeElement = this._document.activeElement || null;
+        if (activeElement && typeof (<any>activeElement).blur === 'function') (<any>activeElement).blur();
+        
         let tpl: string;
         let title: string;
         [tpl, title] = await this.router.loadRouteTemplates(route, path);

@@ -231,6 +231,15 @@ describe('BrowserPlatformAdapter', () => {
                 expect(events[0].route).toBe(route);
                 expect(events[0].path).toBe(path);
             });
+            it('should blur the current active element', async () => {
+                let route = <any>['fish', 'one'];
+                let path = '/';
+                let activeElement = { blur: function() { } };
+                spyOn(activeElement, 'blur');
+                (<any>_document).activeElement = activeElement;
+                await inst.performNavigation(route, path, true, false);
+                expect(activeElement.blur).toHaveBeenCalled();
+            });
             
             describe('when a new navigation is triggered before router.loadRouteTemplates completes', () => {
                 beforeEach(() => {
