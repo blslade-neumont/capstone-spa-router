@@ -8,6 +8,8 @@ let webpackConfig = require('../webpack/testing');
 
 let rootProjectPath = path.join(__dirname, '../../');
 
+process.env.CHROME_BIN = require('puppeteer').executablePath();
+
 module.exports = {
     
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -25,7 +27,9 @@ module.exports = {
         require('karma-jasmine'),
         require('karma-jasmine-matchers'),
         require('karma-super-dots-reporter'),
-        require('karma-defer-spec-reporter')
+        require('karma-defer-spec-reporter'),
+        require('karma-chrome-launcher'),
+        require('karma-firefox-launcher')
     ],
     
     mime: {
@@ -66,9 +70,6 @@ module.exports = {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     
-    // test results reporter to use
-    // possible values: 'dots', 'progress'
-    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['super-dots', 'defer-spec'],
     superDotsReporter: {
         icon: {
@@ -92,6 +93,17 @@ module.exports = {
     // Passing command line arguments to tests
     client: {
         files:  argv.files ? minimatch.makeRe(argv.files).source : null
+    },
+    
+    // start these browsers
+    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+    browsers: ['ChromeHeadless', 'FirefoxHeadless'],
+    
+    customLaunchers: {
+        FirefoxHeadless: {
+            base: 'Firefox',
+            flags: [ '-headless' ],
+        },
     }
 };
 
