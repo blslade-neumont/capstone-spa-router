@@ -260,7 +260,7 @@ export class Router {
         return html;
     }
     private mergeTitles(titles: string[]): string {
-        return titles[titles.length - 1] || 'Untitled Page';
+        return titles.reduce((prev, curr) => curr.replace(/{}/g, prev), '') || 'Untitled Page';
     }
     
     private async findBestRoute(segments: string[]): Promise<RouteEntryT[] | null> {

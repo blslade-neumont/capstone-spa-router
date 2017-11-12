@@ -403,6 +403,22 @@ describe('Router', () => {
                 ], '/a/b/c');
                 expect(title).toBe('π');
             });
+            it(`should merge the titles from nested routes`, async () => {
+                deps.addSchema([
+                    { name: 'tpl-one', src: 'one.tpl.html', type: 'text' },
+                    { name: 'tpl-two', src: 'two.tpl.html', type: 'text' },
+                    { name: 'tpl-three', src: 'three.tpl.html', type: 'text' }
+                ]);
+                deps.provide('tpl-one', 'One!');
+                deps.provide('tpl-two', 'Two!');
+                deps.provide('tpl-three', 'Three!');
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
+                    { path: 'one', template: { dep: 'tpl-one' }, title: 'A' },
+                    { path: 'two', template: { dep: 'tpl-two' }, title: '{}B{}' },
+                    { path: 'three', template: { dep: 'tpl-three' }, title: '{}C{}' }
+                ], '/a/b/c');
+                expect(title).toEqual('ABACABA');
+            });
             it('should merge the templates from nested routes', async () => {
                 deps.addSchema([
                     { name: 'tpl-one', src: 'one.tpl.html', type: 'text' },
