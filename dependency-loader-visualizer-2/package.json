@@ -12,6 +12,7 @@
         "test-watch": "mocha-typescript-watch -p tsconfig.json \"dist/**/*.spec.js\"",
         "test-once": "mocha --require ts-node/register \"src/**/*.spec.ts\"",
         "test": "yarn test-once -q",
+        "validate-json": "cat ./public/dependencies.json | json-validate ./node_modules/@aboveyou00/capstone-router/schema/dependencies.json",
         "build": "npm run clean-dist -q && webpack --config ./config/webpack/development.js --colors --progress --display-error-details --display-cached",
         "watch": "npm run clean-dist -q && webpack --config ./config/webpack/development.js --colors --progress --display-error-details --display-cached --watch",
         "serve": "http-server dist -p 8087 -c-1 -d false",
@@ -19,6 +20,7 @@
         "copy-assets": "cpr public dist"
     },
     "devDependencies": {
+        "@aboveyou00/json-schema-validator": "^1.1.1",
         "@types/chai": "^3.4.35",
         "@types/chai-as-promised": "^0.0.30",
         "@types/mocha": "^2.2.40",

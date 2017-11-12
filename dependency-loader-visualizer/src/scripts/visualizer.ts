@@ -5,7 +5,7 @@ async function main() {
     (<any>window).dependencyLoader = dependencyLoader;
     createVisualizer(dependencyLoader);
     
-    await dependencyLoader.loadSchema('router.json');
+    await dependencyLoader.loadSchema('dependencies.json');
 }
 
 let visualizerTBody: HTMLTableSectionElement;

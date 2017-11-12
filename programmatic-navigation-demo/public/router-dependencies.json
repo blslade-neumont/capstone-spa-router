@@ -1,0 +1,75 @@
+{
+    "$schema": "../node_modules/@aboveyou00/capstone-router/schema/router-dependencies.json",
+    "routes": [
+        {"path": "", "template": { "dep": "layout-tpl" }, "children": [
+            {"path": "/", "title": "Home", "template": { "dep": "home-tpl" }},
+            {"path": "meat", "template": "", "children": [
+                {"path": "beef", "title": "Beef", "template": { "dep": "beef-tpl" }},
+                {"path": "pork", "title": "Pork", "template": { "dep": "pork-tpl" }},
+                {"path": "chicken", "title": "Chicken", "template": { "dep": "chicken-tpl" }},
+                {"path": "**", "title": "Meat Not Found", "template": { "dep": "meat-not-found-tpl" }}
+            ]},
+            {"path": "fish", "template": "", "children": [
+                {"path": "one", "title": "One Fish", "template": { "dep": "one-fish-tpl" }},
+                {"path": "two", "title": "Two Fish", "template": { "dep": "two-fish-tpl" }},
+                {"path": "red", "title": "Red Fish", "template": { "dep": "red-fish-tpl" }},
+                {"path": "blue", "title": "Blue Fish", "template": { "dep": "blue-fish-tpl" }},
+                {"path": "**", "title": "Fish Not Found", "template": { "dep": "fish-not-found-tpl" }}
+            ]},
+            {"path": "**", "title": "Not Found: ROUTE-PARAM:**", "template": { "dep": "page-not-found-tpl" }}
+        ]}
+    ],
+    "content": [{
+        "name": "routes",
+        "type": "text",
+        "src": "/router-dependencies.json"
+    }, {
+        "name": "layout-tpl",
+        "type": "text",
+        "src": "/templates/layout.tpl.html"
+    }, {
+        "name": "home-tpl",
+        "type": "text",
+        "src": "/templates/home.tpl.html"
+    }, {
+        "name": "beef-tpl",
+        "type": "text",
+        "src": "/templates/beef.tpl.html"
+    }, {
+        "name": "pork-tpl",
+        "type": "text",
+        "src": "/templates/pork.tpl.html"
+    }, {
+        "name": "chicken-tpl",
+        "type": "text",
+        "src": "/templates/chicken.tpl.html"
+    }, {
+        "name": "one-fish-tpl",
+        "type": "text",
+        "src": "/templates/one-fish.tpl.html"
+    }, {
+        "name": "two-fish-tpl",
+        "type": "text",
+        "src": "/templates/two-fish.tpl.html"
+    }, {
+        "name": "red-fish-tpl",
+        "type": "text",
+        "src": "/templates/red-fish.tpl.html"
+    }, {
+        "name": "blue-fish-tpl",
+        "type": "text",
+        "src": "/templates/blue-fish.tpl.html"
+    }, {
+        "name": "page-not-found-tpl",
+        "type": "text",
+        "src": "/templates/page-not-found.tpl.html"
+    }, {
+        "name": "meat-not-found-tpl",
+        "type": "text",
+        "src": "/templates/meat-not-found.tpl.html"
+    }, {
+        "name": "fish-not-found-tpl",
+        "type": "text",
+        "src": "/templates/fish-not-found.tpl.html"
+    }]
+}

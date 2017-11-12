@@ -1,9 +1,17 @@
 {
-    "$schema": "../node_modules/@aboveyou00/capstone-router/schema/dependencies.json",
+    "$schema": "../node_modules/@aboveyou00/capstone-router/schema/router-dependencies.json",
+    "routes": [
+        {"path": "", "template": { "dep": "layout-tpl" }, "children": [
+            {"path": "/", "title": "Home", "template": { "dep": "home-tpl" }},
+            {"path": "pi", "title": "&pi;", "template": { "dep": "pi-tpl" }},
+            {"path": "html5-spec", "title": "HTML5 Specification", "template": { "dep": "html5-spec-tpl" }},
+            {"path": "**", "title": "Not Found: ROUTE-PARAM:**", "template": { "dep": "not-found-tpl" }}
+        ]}
+    ],
     "content": [{
         "name": "routes",
         "type": "text",
-        "src": "/routes.json"
+        "src": "/router-dependencies.json"
     }, {
         "name": "layout-tpl",
         "type": "text",

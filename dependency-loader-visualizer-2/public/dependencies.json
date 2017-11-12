@@ -1,6 +1,5 @@
 {
-    "$schema": "../node_modules/@aboveyou00/capstone-router/router-schema.json",
-    "router": { },
+    "$schema": "../node_modules/@aboveyou00/capstone-router/schema/dependencies.json",
     "content": [{
         "name": "static-text",
         "type": "text",

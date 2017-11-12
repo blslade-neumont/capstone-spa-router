@@ -5,7 +5,7 @@ let router: Router;
 let isLoaded = false;
 (async () => {
     router = new Router();
-    await router.dependencyLoader.loadSchema('/dependencies.json');
+    await router.dependencyLoader.loadSchema('/router-dependencies.json');
     await router.loadRoutes('routes');
     router.events.filter(e => e.type == 'begin').subscribe(navEvent => {
         let navHistory = document.getElementById('navigationHistory');
