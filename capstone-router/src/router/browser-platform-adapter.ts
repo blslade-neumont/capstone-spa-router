@@ -3,7 +3,6 @@ import { PlatformAdapter } from './platform-adapter';
 import { Router } from './router';
 import { RouteEntryT } from './schema';
 import { RouterEventT } from './events';
-import { unescapeHtml } from '../util/unescape-html';
 
 export class BrowserPlatformAdapter extends PlatformAdapter {
     constructor(private debugHistory = false) {
@@ -93,7 +92,7 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
         
         let tpl: string;
         let title: string;
-        [tpl, title] = await this.router.loadRouteTemplates(route, path);
+        [tpl, title] = await this.router.loadRouteTemplateAndTitle(route, path);
         
         if (currentNavIdx !== this.navIdx) return;
         
@@ -107,7 +106,7 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
             historyFn(data, title, newUrl);
         }
         this._outlet.innerHTML = tpl;
-        this._document.title = unescapeHtml(title);
+        this._document.title = title;
         let autofocusElement = this._outlet.querySelector('[autofocus]') || null;
         if (autofocusElement && typeof (<any>autofocusElement).focus === 'function') (<any>autofocusElement).focus();
         if (pushState) this._window.scrollTo(0, 0);

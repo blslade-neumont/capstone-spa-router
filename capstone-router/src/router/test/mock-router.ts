@@ -6,7 +6,7 @@ export class MockRouter {
     
     navigateTo(url: string | string[], pushState = true, awaitRoutes = false) { }
     
-    async loadRouteTemplates(route: RouteEntryT[], path: string): Promise<[string, string]> {
+    async loadRouteTemplateAndTitle(route: RouteEntryT[], path: string): Promise<[string, string]> {
         return ['tpl', 'title'];
     }
 }

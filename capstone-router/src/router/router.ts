@@ -7,6 +7,7 @@ import { PlatformAdapter } from './platform-adapter';
 import { BrowserPlatformAdapter } from './browser-platform-adapter';
 import { RouteEntryT } from './schema';
 import { RouterEventT } from './events';
+import { unescapeHtml } from '../util/unescape-html';
 
 export class Router {
     constructor(
@@ -140,53 +141,60 @@ export class Router {
         this._navigationSubject.next([newRoute, path, pushState]);
     }
     
-    async loadRouteTemplates(route: RouteEntryT[] | null, path: string): Promise<[string, string]> {
+    async loadRouteTemplateAndTitle(route: RouteEntryT[] | null, path: string): Promise<[string, string]> {
         let tpl: string[];
-        let title: string;
+        let title: string[];
         if (!route) {
             tpl = ['Not found'];
-            title = 'Not Found';
+            title = ['Not Found'];
         }
         else {
             let allPathSegments = path.split('/').filter(Boolean);
-            tpl = await Promise.all(route.map(async (rt, idx) => {
-                let tpl = rt.template;
-                let allRouteSegments = (<string[]>[]).concat(...route.slice(0, idx + 1).map(rt => rt.path.split('/').filter(Boolean)));
-                let params = this.calculateRouteParams(allRouteSegments, allPathSegments);
-                if (typeof tpl !== 'string') {
-                    let dep = <string>(<any>tpl).dep,
-                        factory = <string>(<any>tpl).factory;
-                    let result: any;
-                    if (dep) {
-                        result = await this.dependencyLoader.get(dep);
-                    }
-                    else if (factory) {
-                        result = await this.dependencyLoader.get(factory);
-                        if (typeof result !== 'function') throw new Error(`Route template factory must be a function! Invalid template: '${result}'`);
-                    }
-                    else throw new Error(`Invalid template parameter: ${tpl}`);
-                    if (typeof result === 'function') {
-                        result = result(path, params);
-                        if (result && result.then) result = await result;
-                    }
-                    if (typeof result !== 'string') throw new Error(`Route template must be a string! Invalid template: '${result}'`);
-                    tpl = result;
-                }
-                tpl = this.replaceRouteParamReferences(tpl, params);
-                return tpl;
-            }));
-            title = 'Untitled Page';
-            for (let q = route.length - 1; q >= 0; q--) {
-                if (route[q].title) {
-                    title = route[q].title;
-                    break;
-                }
-            }
-            let allRouteSegments = (<string[]>[]).concat(...route.map(rt => rt.path.split('/').filter(Boolean)));
-            let params = this.calculateRouteParams(allRouteSegments, allPathSegments);
-            title = this.replaceRouteParamReferences(title, params);
+            tpl = await this.resolveRouteTemplates(route, path, allPathSegments);
+            title = await this.resolveRouteTitle(route, allPathSegments);
         }
-        return [this.mergeTemplates(tpl), title];
+        return [this.mergeTemplates(tpl), this.mergeTitles(title)];
+    }
+    private async resolveRouteTemplates(route: RouteEntryT[] | null, path: string, allPathSegments: string[]): Promise<string[]> {
+        return await Promise.all(route.map(async (rt, idx) => {
+            let tpl = rt.template;
+            let allRouteSegments = (<string[]>[]).concat(...route.slice(0, idx + 1).map(rt => rt.path.split('/').filter(Boolean)));
+            let params = this.calculateRouteParams(allRouteSegments, allPathSegments);
+            if (typeof tpl !== 'string') {
+                let dep = <string>(<any>tpl).dep,
+                    factory = <string>(<any>tpl).factory;
+                let result: any;
+                if (dep) {
+                    result = await this.dependencyLoader.get(dep);
+                }
+                else if (factory) {
+                    result = await this.dependencyLoader.get(factory);
+                    if (typeof result !== 'function') throw new Error(`Route template factory must be a function! Invalid template: '${result}'`);
+                }
+                else throw new Error(`Invalid template parameter: ${tpl}`);
+                if (typeof result === 'function') {
+                    result = result(path, params);
+                    if (result && result.then) result = await result;
+                }
+                if (typeof result !== 'string') throw new Error(`Route template must be a string! Invalid template: '${result}'`);
+                tpl = result;
+            }
+            tpl = this.replaceRouteParamReferences(tpl, params);
+            return tpl;
+        }));
+    }
+    private async resolveRouteTitle(route: RouteEntryT[] | null, allPathSegments: string[]) {
+        let results = await Promise.all(route.map(async (rt, idx) => {
+            let title = rt.title;
+            let allRouteSegments = (<string[]>[]).concat(...route.slice(0, idx + 1).map(rt => rt.path.split('/').filter(Boolean)));
+            let params = this.calculateRouteParams(allRouteSegments, allPathSegments);
+            if (title && typeof title !== 'string') {
+                throw new Error(`Not implemented. Title must be string or undefined`);
+            }
+            title = title && unescapeHtml(this.replaceRouteParamReferences(title, params));
+            return title;
+        }));
+        return results.filter(Boolean);
     }
     private calculateRouteParams(routeSegments: string[], pathSegments: string[]): { [key: string]: string } {
         let params: { [key: string]: string } = {};
@@ -250,6 +258,9 @@ export class Router {
         firstIdx = html.indexOf(routerOutletEl);
         if (firstIdx !== -1) throw new Error(`Invalid route template, router-outlet in leaf node.`);
         return html;
+    }
+    private mergeTitles(titles: string[]): string {
+        return titles[titles.length - 1] || 'Untitled Page';
     }
     
     private async findBestRoute(segments: string[]): Promise<RouteEntryT[] | null> {

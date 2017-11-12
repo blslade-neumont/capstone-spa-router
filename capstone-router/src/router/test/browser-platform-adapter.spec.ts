@@ -213,12 +213,12 @@ describe('BrowserPlatformAdapter', () => {
                 }
             });
             
-            it('should invoke router.loadRouteTemplates', async () => {
-                spyOn(router, 'loadRouteTemplates').and.callThrough();
+            it('should invoke router.loadRouteTemplateAndTitle', async () => {
+                spyOn(router, 'loadRouteTemplateAndTitle').and.callThrough();
                 let route = [];
                 let path = '/';
                 await inst.performNavigation(route, path, true, false);
-                expect(router.loadRouteTemplates).toHaveBeenCalledWith(route, path);
+                expect(router.loadRouteTemplateAndTitle).toHaveBeenCalledWith(route, path);
             });
             it('should send a navigation begin event', async () => {
                 let events: RouterEventT[] = [];
@@ -241,9 +241,9 @@ describe('BrowserPlatformAdapter', () => {
                 expect(activeElement.blur).toHaveBeenCalled();
             });
             
-            describe('when a new navigation is triggered before router.loadRouteTemplates completes', () => {
+            describe('when a new navigation is triggered before router.loadRouteTemplateAndTitle completes', () => {
                 beforeEach(() => {
-                    spyOn(router, 'loadRouteTemplates').and.callFake(async () => {
+                    spyOn(router, 'loadRouteTemplateAndTitle').and.callFake(async () => {
                         (<any>inst).navIdx++;
                         return delay(10).then(() => ['tpl', 'title']);
                     });
@@ -270,11 +270,6 @@ describe('BrowserPlatformAdapter', () => {
                 it(`should set the document's title with the loaded route title`, async () => {
                     await inst.performNavigation([], '', true, false);
                     expect(_document.title).toBe('title');
-                });
-                it(`should unescape html character entities in the loaded route title`, async () => {
-                    spyOn(router, 'loadRouteTemplates').and.returnValue(['tpl', '&pi;']);
-                    await inst.performNavigation([], '', true, false);
-                    expect(_document.title).toBe('π');
                 });
                 it(`should call focus on the first element with an autofocus attribute in the route template`, async () => {
                     let outlet = (<any>inst)._outlet;

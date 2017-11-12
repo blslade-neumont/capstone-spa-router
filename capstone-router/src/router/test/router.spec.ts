@@ -227,14 +227,14 @@ describe('Router', () => {
         });
     });
     
-    describe('.loadRouteTemplates', () => {
+    describe('.loadRouteTemplateAndTitle', () => {
         beforeEach(() => {
             (<any>_document).emitEvent('DOMContentLoaded', {});
         });
         
         describe('when the route is null', () => {
             it(`should return 'Not found' for the title and template`, async () => {
-                let [tpl, title] = await inst.loadRouteTemplates(null, '/a/b/c');
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle(null, '/a/b/c');
                 expect(tpl).toEqual('Not found');
                 expect(title).toBe('Not Found');
             });
@@ -250,7 +250,7 @@ describe('Router', () => {
                 deps.provide('tpl-one', 'One!');
                 deps.provide('tpl-two', 'Two!');
                 deps.provide('tpl-three', 'Three!');
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { dep: 'tpl-one' } },
                     { path: 'two', template: { dep: 'tpl-two' } },
                     { path: 'three', template: { dep: 'tpl-three' }, title: 'Title!' }
@@ -258,7 +258,7 @@ describe('Router', () => {
                 expect(tpl).toEqual('One!Two!Three!');
             });
             it('should allow inline templates', async () => {
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: 'One!!!' }
                 ], '/a/b/c');
                 expect(tpl).toEqual('One!!!');
@@ -266,7 +266,7 @@ describe('Router', () => {
             it('should allow dependency-loaded templates', async () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.tpl.html', type: 'text' }]);
                 deps.provide('tpl-one', 'One!');
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { dep: 'tpl-one' } }
                 ], '/a/b/c');
                 expect(tpl).toEqual('One!');
@@ -274,7 +274,7 @@ describe('Router', () => {
             it('should allow dependency-loaded template factories', async () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
                 deps.provide('tpl-one', (path: string) => `((${path}))`);
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { factory: 'tpl-one' } }
                 ], '/a/b/c');
                 expect(tpl).toEqual('((/a/b/c))');
@@ -286,7 +286,7 @@ describe('Router', () => {
                     expect(params.animal).toBe(expectedAnimal);
                     return `((${path}))`;
                 });
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':animal', template: { factory: 'tpl-one' } }
                 ], `/${expectedAnimal}`);
             });
@@ -296,7 +296,7 @@ describe('Router', () => {
                     expect(params.animal).toBeUndefined();
                     return `((${path}))`;
                 });
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'eat', template: { factory: 'tpl-one' } },
                     { path: ':animal', template: 'fishies!' }
                 ], `/eat/horse`);
@@ -308,7 +308,7 @@ describe('Router', () => {
                     expect(params.animal).toBe(expectedAnimal);
                     return `((${path}))`;
                 });
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':animal', template: 'fishies!' },
                     { path: 'eat', template: { factory: 'tpl-one' } }
                 ], `/${expectedAnimal}/eat`);
@@ -317,7 +317,7 @@ describe('Router', () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
                 deps.provide('tpl-one', 'One!!!');
                 try {
-                    await inst.loadRouteTemplates([
+                    await inst.loadRouteTemplateAndTitle([
                         { path: 'one', template: { factory: 'tpl-one' } }
                     ], '/a/b/c');
                 }
@@ -329,7 +329,7 @@ describe('Router', () => {
             });
             it('should fail if a template is not a valid template reference', async () => {
                 try {
-                    await inst.loadRouteTemplates([
+                    await inst.loadRouteTemplateAndTitle([
                         { path: 'one', template: <any>{ purple: 'tpl-one' } }
                     ], '/a/b/c');
                 }
@@ -342,7 +342,7 @@ describe('Router', () => {
             it('should allow template factories to return promises', async () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
                 deps.provide('tpl-one', (path: string) => delay(10).then(() => `((${path}))`));
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { factory: 'tpl-one' } }
                 ], '/a/b/c');
                 expect(tpl).toEqual('((/a/b/c))');
@@ -351,7 +351,7 @@ describe('Router', () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
                 deps.provide('tpl-one', 42);
                 try {
-                    await inst.loadRouteTemplates([
+                    await inst.loadRouteTemplateAndTitle([
                         { path: 'one', template: { dep: 'tpl-one' } }
                     ], '/a/b/c');
                 }
@@ -370,7 +370,7 @@ describe('Router', () => {
                 deps.provide('tpl-one', 'One!');
                 deps.provide('tpl-two', 'Two!');
                 deps.provide('tpl-three', 'Three!');
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { dep: 'tpl-one' } },
                     { path: 'two', template: { dep: 'tpl-two' } },
                     { path: 'three', template: { dep: 'tpl-three' } }
@@ -386,12 +386,22 @@ describe('Router', () => {
                 deps.provide('tpl-one', 'One!');
                 deps.provide('tpl-two', 'Two!');
                 deps.provide('tpl-three', 'Three!');
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { dep: 'tpl-one' }, title: 'Title-One!' },
                     { path: 'two', template: { dep: 'tpl-two' }, title: 'Title-Two!' },
                     { path: 'three', template: { dep: 'tpl-three' } }
                 ], '/a/b/c');
                 expect(title).toEqual('Title-Two!');
+            });
+            it(`should unescape html character entities in the loaded route title`, async () => {
+                deps.addSchema([
+                    { name: 'tpl-one', src: 'one.tpl.html', type: 'text' }
+                ]);
+                deps.provide('tpl-one', 'One!');
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
+                    { path: 'one', template: { dep: 'tpl-one' }, title: '&pi;' },
+                ], '/a/b/c');
+                expect(title).toBe('π');
             });
             it('should merge the templates from nested routes', async () => {
                 deps.addSchema([
@@ -402,7 +412,7 @@ describe('Router', () => {
                 deps.provide('tpl-one', 'one(<router-outlet></router-outlet>)eno');
                 deps.provide('tpl-two', 'two(<router-outlet></router-outlet>)owt');
                 deps.provide('tpl-three', 'three(!!!)eerht');
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { dep: 'tpl-one' } },
                     { path: 'two', template: { dep: 'tpl-two' } },
                     { path: 'three', template: { dep: 'tpl-three' }, title: 'Title!' }
@@ -410,37 +420,37 @@ describe('Router', () => {
                 expect(tpl).toBe('one(two(three(!!!)eerht)owt)eno');
             });
             it('should replace route parameter references in the template', async () => {
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':animal', template: 'You selected ROUTE-PARAM:animal!' }
                 ], '/horse');
                 expect(tpl).toBe('You selected horse!');
             });
             it('should replace route parameter references in the title', async () => {
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':animal', template: 'Template', title: 'Animal: ROUTE-PARAM:animal' }
                 ], '/horse');
                 expect(title).toBe('Animal: horse');
             });
             it('should not allow route parameter replacements to insert html', async () => {
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':animal', template: 'You selected ROUTE-PARAM:animal!' }
                 ], '/<br>');
                 expect(tpl).toBe('You selected &lt;br&gt;!');
             });
             it('should escape special regex characters in route param name replacements', async () => {
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':a.b', template: 'ROUTE-PARAM:a.b ROUTE-PARAM:a*b!' }
                 ], '/yes');
                 expect(tpl).toBe('yes ROUTE-PARAM:a*b!');
             });
             it('should replace catchall route path references in the template', async () => {
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: '**', template: 'ROUTE-PARAM:**!' }
                 ], '/catchall/route');
                 expect(tpl).toBe('catchall/route!');
             });
             it('should replace catchall route path references in the title', async () => {
-                let [tpl, title] = await inst.loadRouteTemplates([
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: '**', template: 'My template', title: 'ROUTE-PARAM:**!' }
                 ], '/catchall/route');
                 expect(title).toBe('catchall/route!');
