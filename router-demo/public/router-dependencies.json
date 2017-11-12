@@ -1,14 +1,14 @@
 {
     "$schema": "../node_modules/@aboveyou00/capstone-router/schema/router-dependencies.json",
     "routes": [
-        {"path": "", "template": { "dep": "layout-tpl" }, "children": [
-            {"path": "/", "title": "Home", "template": { "dep": "home-tpl" }},
-            {"path": "about", "title": "About", "template": { "dep": "about-tpl" }},
+        {"path": "", "template": { "dep": "layout-tpl" }, "title": "Router Demo", "children": [
+            {"path": "/", "title": "{} - Home", "template": { "dep": "home-tpl" }},
+            {"path": "about", "title": "{} - About", "template": { "dep": "about-tpl" }},
             {"path": "pages", "template": { "dep": "pages-tpl" }, "children": [
-                {"path": "", "title": "Pages", "template": { "dep": "pages-root-tpl" }},
-                {"path": "1", "title": "Page 1", "template": { "dep": "page1-tpl" }},
-                {"path": "2", "title": "Page 2", "template": { "dep": "page2-tpl" }},
-                {"path": "3", "title": "Page 3", "template": { "dep": "page3-tpl" }}
+                {"path": "", "title": "{} - Pages", "template": { "dep": "pages-root-tpl" }},
+                {"path": "1", "title": "{} - Page 1", "template": { "dep": "page1-tpl" }},
+                {"path": "2", "title": "{} - Page 2", "template": { "dep": "page2-tpl" }},
+                {"path": "3", "title": "{} - Page 3", "template": { "dep": "page3-tpl" }}
             ]},
             {"path": "**", "title": "Not Found: ROUTE-PARAM:**", "template": { "dep": "not-found-tpl" }}
         ]}
@@ -16,7 +16,7 @@
     "content": [{
         "name": "routes",
         "type": "text",
-        "src": "/routes.json"
+        "src": "/router-dependencies.json"
     }, {
         "name": "layout-tpl",
         "type": "text",
