@@ -271,6 +271,11 @@ describe('BrowserPlatformAdapter', () => {
                     await inst.performNavigation([], '', true, false);
                     expect(_document.title).toBe('title');
                 });
+                it(`should unescape html character entities in the loaded route title`, async () => {
+                    spyOn(router, 'loadRouteTemplates').and.returnValue(['tpl', '&pi;']);
+                    await inst.performNavigation([], '', true, false);
+                    expect(_document.title).toBe('π');
+                });
                 it(`should call focus on the first element with an autofocus attribute in the route template`, async () => {
                     let outlet = (<any>inst)._outlet;
                     let autofocusEl = { focus: function() { } };
