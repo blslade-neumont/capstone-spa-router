@@ -569,6 +569,47 @@ describe('Router', () => {
         });
     });
     
+    describe('.mergeTitles', () => {
+        let fn: (templates: string[]) => string;
+        beforeEach(() => {
+            fn = (<any>inst).mergeTitles.bind(inst);
+        });
+        
+        it('should return the single title when there is only one title', () => {
+            let expected = 'Hello, World!';
+            let result = fn([expected]);
+            expect(result).toBe(expected);
+        });
+        it('should take the latest title if there is no title outlet ({})', () => {
+            let tpls: string[] = ['One', 'Two'];
+            let result = fn(tpls);
+            expect(result).toBe('Two');
+        });
+        it('should transclude templates if there is a title outlet ({})', () => {
+            let tpls: string[] = ['one', 'two({})owt'];
+            let expected = 'two(one)owt';
+            let result = fn(tpls);
+            expect(result).toBe(expected);
+        });
+        it('should not fail if a title includes more than one title outlet', () => {
+            let tpls: string[] = ['one', '{} two {}'];
+            let expected = 'one two one';
+            let result = fn(tpls);
+            expect(result).toBe(expected);
+        });
+        it('should return "Untitled Page" when there are no titles', () => {
+            let expected = 'Untitled Page';
+            let result = fn([]);
+            expect(result).toBe(expected);
+        });
+        it('should ignore any title outlets in the first title', () => {
+            let tpls: string[] = ['one {}', '{} two'];
+            let expected = 'one {} two';
+            let result = fn(tpls);
+            expect(result).toBe(expected);
+        });
+    });
+    
     describe('.findBestRoute', () => {
         let fn: (segments: string[]) => Promise<any[] | null>;
         beforeEach(() => {
@@ -849,7 +890,7 @@ describe('Router', () => {
         it('should return false if the segments do not match', () => {
             expect(fn('fish', 'horse')).toBe(false);
         });
-        it('should return match any path segment to a route parameter segment', () => {
+        it('should match any path segment to a route parameter segment', () => {
             expect(fn('horse', ':animal')).toBe(true);
             expect(fn('donkey', ':animal')).toBe(true);
         });
