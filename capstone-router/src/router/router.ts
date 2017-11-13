@@ -9,6 +9,10 @@ import { RouteEntryT } from './schema';
 import { RouterEventT, NavigationProgressEventT } from './events';
 import { unescapeHtml } from '../util/unescape-html';
 
+export type NavigationProgressOptions = {
+    color?: string
+};
+
 export class Router {
     constructor(
         private _dependencyLoader: DependencyLoader = new NetworkDependencyLoader(),
@@ -57,6 +61,61 @@ export class Router {
         });
         let location = this.platformAdapter.location;
         this.navigateTo(location.pathname, false, true);
+    }
+    
+    addNavigationProgressBar(opts?: NavigationProgressOptions, document?: HTMLDocument) {
+        if (!opts) opts = {};
+        if (!document) document = window.document;
+        
+        let progressRoot = document.createElement('div');
+        progressRoot.classList.add('router-navigation-progress-root');
+        progressRoot.style.position = 'fixed';
+        progressRoot.style.width = '100%';
+        progressRoot.style.height = '4px';
+        progressRoot.style.overflow = 'hidden';
+        progressRoot.style['z-index'] = '10000';
+        progressRoot.style.left = '0';
+        progressRoot.style.top = '0';
+        document.body.appendChild(progressRoot);
+        
+        let progressContainer = document.createElement('div');
+        progressContainer.classList.add('router-navigation-progress-container');
+        progressContainer.style.height = '4px';
+        progressRoot.appendChild(progressContainer);
+        
+        let progressDiv = document.createElement('div');
+        progressDiv.classList.add('router-navigation-progress');
+        progressDiv.style.background = opts.color || 'rgb(128, 255, 128)';
+        progressDiv.style.height = '4px';
+        progressDiv.style['border-top-left-radius'] = '0';
+        progressDiv.style['border-bottom-left-radius'] = '0';
+        progressDiv.style.opacity = '0';
+        progressContainer.appendChild(progressDiv);
+        
+        let showProgressBar = false;
+        let lastProgress = 0;
+        this.events.subscribe(evt => {
+            switch (evt.type) {
+            case 'begin':
+                showProgressBar = true;
+                lastProgress = 0;
+                progressDiv.style.width = `3%`;
+                progressDiv.style.transition = '.3s opacity linear';
+                break;
+                
+            case 'progress':
+                let transitionWidth = lastProgress < evt.progress;
+                lastProgress = evt.progress;
+                progressDiv.style.width = `${3 + evt.progress*97}%`;
+                progressDiv.style.opacity = (evt.progress < 1 && showProgressBar) ? '1' : '0';
+                progressDiv.style.transition = transitionWidth ? '.3s width linear, .3s opacity linear' : '.3s opacity linear';
+                break;
+                
+            case 'end':
+                showProgressBar = false;
+                break;
+            }
+        });
     }
     
     get dependencyLoader() {
