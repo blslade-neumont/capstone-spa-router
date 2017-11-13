@@ -245,7 +245,7 @@ describe('Router', () => {
         
         describe('when the route is null', () => {
             it(`should return 'Not found' for the title and template`, async () => {
-                let [tpl, title] = await inst.loadRouteTemplateAndTitle(null, '/a/b/c');
+                let [tpl, title] = await inst.loadRouteTemplateAndTitle(null, '/a/b/c', 1);
                 expect(tpl).toEqual('Not found');
                 expect(title).toBe('Not Found');
             });
@@ -265,13 +265,13 @@ describe('Router', () => {
                     { path: 'one', template: { dep: 'tpl-one' } },
                     { path: 'two', template: { dep: 'tpl-two' } },
                     { path: 'three', template: { dep: 'tpl-three' }, title: 'Title!' }
-                ], '/a/b/c');
+                ], '/a/b/c', 1);
                 expect(tpl).toEqual('One!Two!Three!');
             });
             it('should allow inline templates', async () => {
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: 'One!!!' }
-                ], '/a/b/c');
+                ], '/a/b/c', 1);
                 expect(tpl).toEqual('One!!!');
             });
             it('should allow dependency-loaded templates', async () => {
@@ -279,7 +279,7 @@ describe('Router', () => {
                 deps.provide('tpl-one', 'One!');
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { dep: 'tpl-one' } }
-                ], '/a/b/c');
+                ], '/a/b/c', 1);
                 expect(tpl).toEqual('One!');
             });
             it('should allow dependency-loaded template factories', async () => {
@@ -287,7 +287,7 @@ describe('Router', () => {
                 deps.provide('tpl-one', (path: string) => `((${path}))`);
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { factory: 'tpl-one' } }
-                ], '/a/b/c');
+                ], '/a/b/c', 1);
                 expect(tpl).toEqual('((/a/b/c))');
             });
             it('should pass template parameters into template factories', async () => {
@@ -299,7 +299,7 @@ describe('Router', () => {
                 });
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':animal', template: { factory: 'tpl-one' } }
-                ], `/${expectedAnimal}`);
+                ], `/${expectedAnimal}`, 1);
             });
             it('should not pass template parameters for deeper nested routes', async () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
@@ -310,7 +310,7 @@ describe('Router', () => {
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'eat', template: { factory: 'tpl-one' } },
                     { path: ':animal', template: 'fishies!' }
-                ], `/eat/horse`);
+                ], `/eat/horse`, 1);
             });
             it('should pass template parameters for parent nested routes', async () => {
                 let expectedAnimal = 'horse';
@@ -322,7 +322,7 @@ describe('Router', () => {
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':animal', template: 'fishies!' },
                     { path: 'eat', template: { factory: 'tpl-one' } }
-                ], `/${expectedAnimal}/eat`);
+                ], `/${expectedAnimal}/eat`, 1);
             });
             it('should fail if a template factory dependency is not a function', async () => {
                 deps.addSchema([{ name: 'tpl-one', src: 'one.js', type: 'script', methodName: 'getOneFactory' }]);
@@ -330,7 +330,7 @@ describe('Router', () => {
                 try {
                     await inst.loadRouteTemplateAndTitle([
                         { path: 'one', template: { factory: 'tpl-one' } }
-                    ], '/a/b/c');
+                    ], '/a/b/c', 1);
                 }
                 catch (e) {
                     expect(e.message).toMatch(/must be a function/i);
@@ -342,7 +342,7 @@ describe('Router', () => {
                 try {
                     await inst.loadRouteTemplateAndTitle([
                         { path: 'one', template: <any>{ purple: 'tpl-one' } }
-                    ], '/a/b/c');
+                    ], '/a/b/c', 1);
                 }
                 catch (e) {
                     expect(e.message).toMatch(/invalid template parameter/i);
@@ -355,7 +355,7 @@ describe('Router', () => {
                 deps.provide('tpl-one', (path: string) => delay(10).then(() => `((${path}))`));
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { factory: 'tpl-one' } }
-                ], '/a/b/c');
+                ], '/a/b/c', 1);
                 expect(tpl).toEqual('((/a/b/c))');
             });
             it('should fail if the template does not resolve to be a string', async () => {
@@ -364,7 +364,7 @@ describe('Router', () => {
                 try {
                     await inst.loadRouteTemplateAndTitle([
                         { path: 'one', template: { dep: 'tpl-one' } }
-                    ], '/a/b/c');
+                    ], '/a/b/c', 1);
                 }
                 catch (e) {
                     expect(e.message).toMatch(/must be a string/i);
@@ -385,7 +385,7 @@ describe('Router', () => {
                     { path: 'one', template: { dep: 'tpl-one' } },
                     { path: 'two', template: { dep: 'tpl-two' } },
                     { path: 'three', template: { dep: 'tpl-three' } }
-                ], '/a/b/c');
+                ], '/a/b/c', 1);
                 expect(title).toEqual('Untitled Page');
             });
             it(`should return the title of the most granular route segment that specifies a title`, async () => {
@@ -401,7 +401,7 @@ describe('Router', () => {
                     { path: 'one', template: { dep: 'tpl-one' }, title: 'Title-One!' },
                     { path: 'two', template: { dep: 'tpl-two' }, title: 'Title-Two!' },
                     { path: 'three', template: { dep: 'tpl-three' } }
-                ], '/a/b/c');
+                ], '/a/b/c', 1);
                 expect(title).toEqual('Title-Two!');
             });
             it(`should unescape html character entities in the loaded route title`, async () => {
@@ -411,7 +411,7 @@ describe('Router', () => {
                 deps.provide('tpl-one', 'One!');
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: 'one', template: { dep: 'tpl-one' }, title: '&pi;' },
-                ], '/a/b/c');
+                ], '/a/b/c', 1);
                 expect(title).toBe('π');
             });
             it(`should merge the titles from nested routes`, async () => {
@@ -427,7 +427,7 @@ describe('Router', () => {
                     { path: 'one', template: { dep: 'tpl-one' }, title: 'A' },
                     { path: 'two', template: { dep: 'tpl-two' }, title: '{}B{}' },
                     { path: 'three', template: { dep: 'tpl-three' }, title: '{}C{}' }
-                ], '/a/b/c');
+                ], '/a/b/c', 1);
                 expect(title).toEqual('ABACABA');
             });
             it('should merge the templates from nested routes', async () => {
@@ -443,43 +443,43 @@ describe('Router', () => {
                     { path: 'one', template: { dep: 'tpl-one' } },
                     { path: 'two', template: { dep: 'tpl-two' } },
                     { path: 'three', template: { dep: 'tpl-three' }, title: 'Title!' }
-                ], '/a/b/c');
+                ], '/a/b/c', 1);
                 expect(tpl).toBe('one(two(three(!!!)eerht)owt)eno');
             });
             it('should replace route parameter references in the template', async () => {
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':animal', template: 'You selected ROUTE-PARAM:animal!' }
-                ], '/horse');
+                ], '/horse', 1);
                 expect(tpl).toBe('You selected horse!');
             });
             it('should replace route parameter references in the title', async () => {
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':animal', template: 'Template', title: 'Animal: ROUTE-PARAM:animal' }
-                ], '/horse');
+                ], '/horse', 1);
                 expect(title).toBe('Animal: horse');
             });
             it('should not allow route parameter replacements to insert html', async () => {
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':animal', template: 'You selected ROUTE-PARAM:animal!' }
-                ], '/<br>');
+                ], '/<br>', 1);
                 expect(tpl).toBe('You selected &lt;br&gt;!');
             });
             it('should escape special regex characters in route param name replacements', async () => {
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: ':a.b', template: 'ROUTE-PARAM:a.b ROUTE-PARAM:a*b!' }
-                ], '/yes');
+                ], '/yes', 1);
                 expect(tpl).toBe('yes ROUTE-PARAM:a*b!');
             });
             it('should replace catchall route path references in the template', async () => {
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: '**', template: 'ROUTE-PARAM:**!' }
-                ], '/catchall/route');
+                ], '/catchall/route', 1);
                 expect(tpl).toBe('catchall/route!');
             });
             it('should replace catchall route path references in the title', async () => {
                 let [tpl, title] = await inst.loadRouteTemplateAndTitle([
                     { path: '**', template: 'My template', title: 'ROUTE-PARAM:**!' }
-                ], '/catchall/route');
+                ], '/catchall/route', 1);
                 expect(title).toBe('catchall/route!');
             });
         });

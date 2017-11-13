@@ -90,11 +90,9 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
         let activeElement = this._document.activeElement || null;
         if (activeElement && typeof (<any>activeElement).blur === 'function') (<any>activeElement).blur();
         
-        let tpl: string;
-        let title: string;
-        [tpl, title] = await this.router.loadRouteTemplateAndTitle(route, path);
-        
-        if (currentNavIdx !== this.navIdx) return;
+        this.router.resetNavigationProgress(currentNavIdx);
+        let [tpl, title] = await this.router.loadRouteTemplateAndTitle(route, path, currentNavIdx);
+        if (!this.router.completeNavigationProgress(currentNavIdx)) return;
         
         if (modifyHistory) {
             let historyFn = this._history[pushState ? 'pushState' : 'replaceState'];

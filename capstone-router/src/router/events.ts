@@ -1,16 +1,20 @@
 import { RouteEntryT } from './schema';
 
-export type BeginNavigationEventT = {
+export type NavigationBeginEventT = {
     type: 'begin',
     route: RouteEntryT[] | null,
     path: string
 };
-export type EndNavigationEventT = {
+export type NavigationProgressEventT = {
+    type: 'progress',
+    progress: number
+};
+export type NavigationEndEventT = {
     type: 'end',
     route: RouteEntryT[] | null,
     path: string
 };
 
-export type NavigationEventT = BeginNavigationEventT | EndNavigationEventT;
+export type NavigationEventT = NavigationBeginEventT | NavigationProgressEventT | NavigationEndEventT;
 
 export type RouterEventT = NavigationEventT;

@@ -14,6 +14,8 @@ import { RouterEventT } from '../events';
 import { Router } from '../router';
 import { delay } from '../../util/delay';
 
+let anything = jasmine.anything();
+
 describe('BrowserPlatformAdapter', () => {
     sharedPlatformAdapterTests(() => {
         let inst = new BrowserPlatformAdapter();
@@ -218,7 +220,7 @@ describe('BrowserPlatformAdapter', () => {
                 let route = [];
                 let path = '/';
                 await inst.performNavigation(route, path, true, false);
-                expect(router.loadRouteTemplateAndTitle).toHaveBeenCalledWith(route, path);
+                expect(router.loadRouteTemplateAndTitle).toHaveBeenCalledWith(route, path, anything);
             });
             it('should send a navigation begin event', async () => {
                 let events: RouterEventT[] = [];
@@ -228,8 +230,8 @@ describe('BrowserPlatformAdapter', () => {
                 await inst.performNavigation(route, path, true, false);
                 expect(events.length).toBe(2);
                 expect(events[0].type).toBe('begin');
-                expect(events[0].route).toBe(route);
-                expect(events[0].path).toBe(path);
+                expect((<any>events[0]).route).toBe(route);
+                expect((<any>events[0]).path).toBe(path);
             });
             it('should blur the current active element', async () => {
                 let route = <any>['fish', 'one'];
@@ -245,6 +247,7 @@ describe('BrowserPlatformAdapter', () => {
                 beforeEach(() => {
                     spyOn(router, 'loadRouteTemplateAndTitle').and.callFake(async () => {
                         (<any>inst).navIdx++;
+                        (<any>router).currentNavigationIndex++;
                         return delay(10).then(() => ['tpl', 'title']);
                     });
                 });
@@ -321,8 +324,8 @@ describe('BrowserPlatformAdapter', () => {
                     await inst.performNavigation(route, path, true, false);
                     expect(events.length).toBe(2);
                     expect(events[1].type).toBe('end');
-                    expect(events[1].route).toBe(route);
-                    expect(events[1].path).toBe(path);
+                    expect((<any>events[1]).route).toBe(route);
+                    expect((<any>events[1]).path).toBe(path);
                 });
             });
         });

@@ -6,7 +6,7 @@ import { DependencyLoader, NetworkDependencyLoader } from '../dependency-loader'
 import { PlatformAdapter } from './platform-adapter';
 import { BrowserPlatformAdapter } from './browser-platform-adapter';
 import { RouteEntryT } from './schema';
-import { RouterEventT } from './events';
+import { RouterEventT, NavigationProgressEventT } from './events';
 import { unescapeHtml } from '../util/unescape-html';
 
 export class Router {
@@ -29,8 +29,14 @@ export class Router {
                 catch (e) { reject(e); }
             });
         });
+        
+        this.progressSubject.map(progress => (<NavigationProgressEventT>{
+            type: 'progress',
+            progress: progress
+        })).subscribe(this.eventsSubject);
     }
     
+    protected progressSubject = new Subject<number>();
     protected eventsSubject = new Subject<RouterEventT>();
     readonly events = this.eventsSubject.asObservable();
     
@@ -147,23 +153,23 @@ export class Router {
         this._navigationSubject.next([newRoute, path, pushState]);
     }
     
-    async loadRouteTemplateAndTitle(route: RouteEntryT[] | null, path: string): Promise<[string, string]> {
+    async loadRouteTemplateAndTitle(route: RouteEntryT[] | null, path: string, navIdx: number): Promise<[string, string]> {
         if (!route) {
             return ['Not found', 'Not Found'];
         }
         else {
             let allPathSegments = path.split('/').filter(Boolean);
-            let [tpls, titles] = await this.resolveRouteTemplatesAndTitles(route, path, allPathSegments);
+            let [tpls, titles] = await this.resolveRouteTemplatesAndTitles(route, path, allPathSegments, navIdx);
             return [this.mergeTemplates(tpls), this.mergeTitles(titles)];
         }
     }
-    private async resolveRouteTemplatesAndTitles(route: RouteEntryT[] | null, path: string, allPathSegments: string[]): Promise<[string[], string[]]> {
+    private async resolveRouteTemplatesAndTitles(route: RouteEntryT[] | null, path: string, allPathSegments: string[], navIdx: number): Promise<[string[], string[]]> {
          let routeTemplateTitles = await Promise.all(route.map(async (rt, idx) => {
             let allRouteSegments = (<string[]>[]).concat(...route.slice(0, idx + 1).map(rt => rt.path.split('/').filter(Boolean)));
             let params = this.calculateRouteParams(allRouteSegments, allPathSegments);
             let [tpl, title] = await Promise.all([
-                this.resolveReference(rt.template, 'Route template', path, params),
-                this.resolveReference(rt.title, 'Route title', path, params)
+                this.resolveReference(rt.template, 'Route template', path, params, navIdx),
+                this.resolveReference(rt.title, 'Route title', path, params, navIdx)
             ]);
             tpl = tpl && this.replaceRouteParamReferences(tpl, params);
             title = title && unescapeHtml(this.replaceRouteParamReferences(title, params));
@@ -190,12 +196,13 @@ export class Router {
         }
         return params;
     }
-    private async resolveReference(ref: any, semantics: string, path: string, params: { [key: string]: string }): Promise<string> {
+    private async resolveReference(ref: any, semantics: string, path: string, params: { [key: string]: string }, navIdx: number): Promise<string> {
         if (!ref) return ref;
         if (typeof ref !== 'string') {
             let dep = <string>(<any>ref).dep,
                 factory = <string>(<any>ref).factory;
             let result: any;
+            this.addNavigationDependency(navIdx, 2);
             if (dep) {
                 result = await this.dependencyLoader.get(dep);
             }
@@ -204,11 +211,13 @@ export class Router {
                 if (typeof result !== 'function') throw new Error(`${semantics} factory must be a function! Invalid reference: '${result}'`);
             }
             else throw new Error(`Invalid template parameter: ${ref}`);
+            this.completeNavigationDependency(navIdx, 1);
             if (typeof result === 'function') {
                 result = result(path, params);
                 if (result && result.then) result = await result;
             }
             if (typeof result !== 'string') throw new Error(`${semantics} must be a string! Invalid reference: '${result}'`);
+            this.completeNavigationDependency(navIdx, 1);
             ref = result;
         }
         return <string>ref;
@@ -264,6 +273,33 @@ export class Router {
         let title = titles.reduce((prev, curr) => curr.replace(/{}/g, prev), '{}');
         if (title === '{}') title = 'Untitled Page';
         return title;
+    }
+    
+    private currentNavigationIdx = -1;
+    private navigationNumerator = 0;
+    private navigationDenominator = 1;
+    resetNavigationProgress(navigationIdx: number) {
+        this.currentNavigationIdx = navigationIdx;
+        this.navigationNumerator = 0;
+        this.navigationDenominator = 1;
+        this.progressSubject.next(this.navigationNumerator / this.navigationDenominator);
+    }
+    private addNavigationDependency(navigationIdx: number, count = 1) {
+        if (this.currentNavigationIdx !== navigationIdx) return;
+        this.navigationDenominator += count;
+        this.progressSubject.next(this.navigationNumerator / this.navigationDenominator);
+    }
+    private completeNavigationDependency(navigationIdx: number, count = 1) {
+        if (this.currentNavigationIdx !== navigationIdx) return;
+        this.navigationNumerator += count;
+        this.progressSubject.next(this.navigationNumerator / this.navigationDenominator);
+    }
+    completeNavigationProgress(navigationIdx: number) {
+        if (this.currentNavigationIdx !== navigationIdx) return false;
+        this.navigationNumerator = this.navigationDenominator;
+        this.progressSubject.next(this.navigationNumerator / this.navigationDenominator);
+        this.currentNavigationIdx = -1;
+        return true;
     }
     
     private async findBestRoute(segments: string[]): Promise<RouteEntryT[] | null> {

@@ -9,6 +9,14 @@ export class MockRouter {
     async loadRouteTemplateAndTitle(route: RouteEntryT[], path: string): Promise<[string, string]> {
         return ['tpl', 'title'];
     }
+    
+    private currentNavigationIndex;
+    resetNavigationProgress(idx: number) {
+        this.currentNavigationIndex = idx;
+    }
+    completeNavigationProgress(idx: number) {
+        return this.currentNavigationIndex === idx;
+    }
 }
 
 export function createMockRouter(): Router {
