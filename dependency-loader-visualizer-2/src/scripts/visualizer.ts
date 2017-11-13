@@ -117,20 +117,15 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
         let dep = depMap.get(name);
         if (!dep) throw new Error(`Unknown dependency: ${name}`);
         let generation: number;
-        switch (dep.type) {
-        case 'text':
-            generation = 0;
-            break;
-        case 'script':
-            generation = (dep.deps || [])
-                .map(depName => getGeneration(depName) + 1)
-                .reduce((prev, curr) => Math.max(prev, curr), 0);
-            break;
-        default:
-            throw new Error(`Not supported`);
-        }
+        let allDeps = getAllDeps(dep);
+        generation = allDeps
+            .map(depName => getGeneration(depName) + 1)
+            .reduce((prev, curr) => Math.max(prev, curr), 0);
         generationMap.set(name, generation);
         return generation;
+    }
+    function getAllDeps(dep: SchemaEntryT) {
+        return <string[]>[...new Set([...(dep.deps || []), ...((dep.type === 'script' && (<any>dep).args) || [])])];
     }
     
     let rowMap = new Map<string, number>();
@@ -157,21 +152,15 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
         unplaced.splice(idx, 1);
     }
     function lastRowFromDeps(entry: SchemaEntryT) {
-        switch (entry.type) {
-        case 'text':
-            return nextAvailableGen0++;
-        case 'script':
-            if (!entry.deps || !entry.deps.length) return nextAvailableGen0++;
-            let maxRow = -Infinity;
-            for (let dep of entry.deps) {
-                if (!rowMap.has(dep)) emplace(dep);
-                let depRow = rowMap.get(dep);
-                if (depRow > maxRow) maxRow = depRow;
-            }
-            return maxRow;
-        default:
-            throw new Error(`Not supported!`);
+        let allDeps = getAllDeps(entry);
+        if (!allDeps.length) return nextAvailableGen0++;
+        let maxRow = -Infinity;
+        for (let dep of allDeps) {
+            if (!rowMap.has(dep)) emplace(dep);
+            let depRow = rowMap.get(dep);
+            if (depRow > maxRow) maxRow = depRow;
         }
+        return maxRow;
     }
     function findNextAvailableSlot(gen: number, row: number) {
         while (true) {
@@ -262,12 +251,11 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
         context.beginPath();
         for (let dep of dependencies) {
             let rightBtn = dependencyBtnMap.get(dep.name);
-            if (dep.type == 'script') {
-                for (let dep2 of (dep.deps || [])) {
-                    let leftBtn = dependencyBtnMap.get(dep2);
-                    context.moveTo(rightBtn.offsetLeft - 5, rightBtn.offsetTop + (rightBtn.offsetHeight / 2));
-                    context.lineTo(leftBtn.offsetLeft + leftBtn.offsetWidth + 5, leftBtn.offsetTop + (leftBtn.offsetHeight / 2));
-                }
+            let allDeps = getAllDeps(dep);
+            for (let dep2 of allDeps) {
+                let leftBtn = dependencyBtnMap.get(dep2);
+                context.moveTo(rightBtn.offsetLeft - 5, rightBtn.offsetTop + (rightBtn.offsetHeight / 2));
+                context.lineTo(leftBtn.offsetLeft + leftBtn.offsetWidth + 5, leftBtn.offsetTop + (leftBtn.offsetHeight / 2));
             }
         }
         context.stroke();

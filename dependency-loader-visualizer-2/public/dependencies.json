@@ -14,7 +14,7 @@
         "type": "script",
         "src": "scripts/lazy2.bundle.js",
         "methodName": "lazy2",
-        "deps": ["lazy1"]
+        "args": ["lazy1"]
     }, {
         "name": "lazy3-a",
         "type": "script",
@@ -25,12 +25,12 @@
         "type": "script",
         "src": "scripts/lazy3.bundle.js",
         "methodName": "lazy3B",
-        "deps": ["static-text"]
+        "args": ["static-text"]
     }, {
         "name": "lazy3-c",
         "type": "script",
         "src": "scripts/lazy3.bundle.js",
         "methodName": "lazy3C",
-        "deps": ["lazy1", "lazy2", "lazy3-a", "lazy3-b"]
+        "args": ["lazy1", "lazy2", "lazy3-a", "lazy3-b"]
     }]
 }

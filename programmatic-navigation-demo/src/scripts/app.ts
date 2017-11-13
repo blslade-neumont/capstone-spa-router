@@ -5,17 +5,18 @@ let router: Router;
 let isLoaded = false;
 (async () => {
     router = new Router();
+    router.addNavigationProgressBar();
     await router.dependencyLoader.loadSchema('/router-dependencies.json');
     await router.loadRoutes('routes');
     router.events.filter(e => e.type == 'begin').subscribe(navEvent => {
         let navHistory = document.getElementById('navigationHistory');
         let anchor = document.createElement('a');
         anchor.href = '#';
-        anchor.innerHTML = navEvent.path;
+        anchor.innerHTML = (<any>navEvent).path;
         anchor.addEventListener('click', e => {
             e.preventDefault();
             e.stopPropagation();
-            router.navigateTo(navEvent.path);
+            router.navigateTo((<any>navEvent).path);
         });
         if (navHistory.firstChild) navHistory.insertBefore(anchor, navHistory.firstChild);
         else navHistory.appendChild(anchor);
