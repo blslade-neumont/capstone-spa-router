@@ -85,7 +85,7 @@ export class Router {
         
         let progressDiv = document.createElement('div');
         progressDiv.classList.add('router-navigation-progress');
-        progressDiv.style.background = opts.color || 'rgb(128, 255, 128)';
+        progressDiv.style.background = opts.color || 'rgb(86, 86, 255)';
         progressDiv.style.height = '4px';
         progressDiv.style['border-top-left-radius'] = '0';
         progressDiv.style['border-bottom-left-radius'] = '0';
