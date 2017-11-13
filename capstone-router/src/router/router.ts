@@ -179,11 +179,11 @@ export class Router {
         }
     }
     private validateReference(ref: any, semantics: string, allowNull: boolean) {
-        if (!ref) {
-            if (!allowNull) throw new Error(`All routes must have ${semantics}s`);
-            return;
-        }
         if (typeof ref !== 'string') {
+            if (!ref) {
+                if (!allowNull) throw new Error(`All routes must have ${semantics}s`);
+                return;
+            }
             if (typeof ref.dep !== 'string' && typeof ref.factory !== 'string') throw new Error(`Route ${semantics}s must be strings, or { dep: string }, or { factory: string }`);
         }
     }
