@@ -12,6 +12,12 @@
                 },
                 "src": {
                     "type": "string"
+                },
+                "deps": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             },
             "required": ["name", "type", "src"]
@@ -31,6 +37,12 @@
                     "type": "string"
                 },
                 "deps": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "args": {
                     "type": "array",
                     "items": {
                         "type": "string"

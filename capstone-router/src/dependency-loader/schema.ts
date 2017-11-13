@@ -4,6 +4,7 @@ export interface BaseContentMetaT {
     name: string;
     type: string;
     src: string;
+    deps?: string[];
 }
 export interface SimpleContentMetaT extends BaseContentMetaT {
     type: "text";
@@ -11,7 +12,7 @@ export interface SimpleContentMetaT extends BaseContentMetaT {
 export interface DynamicContentMetaT extends BaseContentMetaT {
     type: "script";
     methodName: string;
-    deps?: string[];
+    args?: string[];
 }
 export type ContentMetaT = SimpleContentMetaT | DynamicContentMetaT;
 

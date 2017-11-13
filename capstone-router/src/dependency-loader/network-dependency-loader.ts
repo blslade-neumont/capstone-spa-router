@@ -149,6 +149,9 @@ export class NetworkDependencyLoader extends DependencyLoader {
         
         let content: any;
         
+        let depNames = meta.deps || [];
+        await Promise.all(depNames.map(dep => this.get<any>(dep)));
+        
         switch (meta.type) {
         case "text":
             await this.loadContentResource(meta.src);
@@ -156,13 +159,13 @@ export class NetworkDependencyLoader extends DependencyLoader {
             break;
             
         case "script":
-            let depNames = meta.deps || [];
-            let allPromises = depNames.map(name => this.get<any>(name));
+            let argNames = meta.args || [];
+            let allPromises = argNames.map(name => this.get<any>(name));
             allPromises.push(this.executeScriptResource(meta.src));
-            let deps = (await Promise.all(allPromises)).slice(0, depNames.length);
+            let args = (await Promise.all(allPromises)).slice(0, argNames.length);
             let fn = this._global[meta.methodName];
             if (typeof fn !== 'function') throw new Error(`Content '${meta.name}' uses methodName ${meta.methodName}, which is not a function`);
-            content = await fn(...deps);
+            content = await fn(...args);
             break;
             
         default:

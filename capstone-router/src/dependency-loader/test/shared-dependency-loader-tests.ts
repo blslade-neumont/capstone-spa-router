@@ -89,6 +89,14 @@ export function sharedDependencyLoaderTests<T extends DependencyLoader>(factoryF
                 ];
                 expect(() => (<any>inst).validateSchema(schema)).toThrowError(/invalid content type/i);
             });
+            it('should prevent schema entries from having a deps property that is not a string array', () => {
+                let schema: SchemaT = [{ type: 'text', name: 'one', src: 'source.txt', deps: <any>'fish' }];
+                expect(() => (<any>inst).validateSchema(schema)).toThrowError(/deps.* should be an array of strings/i);
+            });
+            it('should prevent script schema entries from having an args property that is not a string array', () => {
+                let schema: SchemaT = [{ type: 'script', name: 'one', src: 'source.txt', methodName: 'blah', args: <any>'fish' }];
+                expect(() => (<any>inst).validateSchema(schema)).toThrowError(/args.* should be an array of strings/i);
+            });
         });
         
         describe('.has', () => {

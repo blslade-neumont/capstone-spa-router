@@ -105,8 +105,9 @@ describe('NetworkDependencyLoader', () => {
         
         describe('.getContentImpl', () => {
             let textContent: SimpleContentMetaT = { type: 'text', name: 'text', src: 'text.txt' };
+            let textDepContent: SimpleContentMetaT = { type: 'text', name: 'textWithDep', src: 'text2.txt', deps: ['text'] };
             let scriptContent: DynamicContentMetaT = { type: 'script', name: 'script', src: 'script.js', methodName: 'dl_func' };
-            let scriptDepContent: DynamicContentMetaT = { type: 'script', name: 'scriptWithDep', src: 'script.js', methodName: 'dl_func2', deps: ['script'] };
+            let scriptArgContent: DynamicContentMetaT = { type: 'script', name: 'scriptWithArg', src: 'script.js', methodName: 'dl_func2', args: ['script'] };
             
             it('should throw an error if the name is not defined in the schema', async () => {
                 try {
@@ -141,6 +142,36 @@ describe('NetworkDependencyLoader', () => {
                 expect((<any>eventsRecieved[1]).name).toBe(textContent.name);
                 expect((<any>eventsRecieved[1]).content).toBe(expectedContent);
             });
+            it('should get all dependency dependencies before fetching the dependency itself', async () => {
+                (<any>inst).schemaMap.set(textDepContent.name, textDepContent);
+                (<any>inst).resources.set(textDepContent.src, { loadPromise: Promise.resolve(), isLoaded: true, isContent: true, content: 'blah' });
+                spyOn(inst, 'get').and.returnValue(Promise.resolve('blah'));
+                await (<any>inst).getContentImpl(textDepContent.name);
+                expect(inst.get).toHaveBeenCalledWith(textDepContent.deps[0]);
+            });
+            it('should wait for the dependency dependencies before fetching the dependency itself', async () => {
+                let rootEvent = { resourceLoaded: () => void(0) };
+                let depEvent = { resourceLoaded: () => void(0) };
+                (<any>inst).schemaMap.set(textContent.name, textContent);
+                (<any>inst).schemaMap.set(textDepContent.name, textDepContent);
+                let spy = spyOn((<any>inst), 'loadContentResource');
+                spy.and.callFake((src: string) => {
+                    let resource: any;
+                    if (src === textContent.src) resource = { loadPromise: delay(100).then(() => depEvent.resourceLoaded()), isLoaded: true, isContent: true, content: 'blah' };
+                    else if (src === textDepContent.src) resource = { loadPromise: Promise.resolve().then(() => rootEvent.resourceLoaded()), isLoaded: true, isContent: true, content: 'blah' };
+                    (<any>inst).resources.set(src, resource);
+                    return resource.loadPromise;
+                });
+                
+                spyOn(rootEvent, 'resourceLoaded').and.callThrough();
+                spyOn(depEvent, 'resourceLoaded').and.callThrough();
+                
+                await (<any>inst).getContentImpl(textDepContent.name);
+                
+                expect(rootEvent.resourceLoaded).toHaveBeenCalled();
+                expect(depEvent.resourceLoaded).toHaveBeenCalled();
+                expect(depEvent.resourceLoaded).toHaveBeenCalledBefore(<any>rootEvent.resourceLoaded);
+            });
             
             describe(`when the content is 'text'`, () => {
                 let expectedContent: 'my-expected-content';
@@ -167,7 +198,7 @@ describe('NetworkDependencyLoader', () => {
             describe(`when the content is 'script'`, () => {
                 beforeEach(() => {
                     (<any>inst).schemaMap.set(scriptContent.name, scriptContent);
-                    (<any>inst).schemaMap.set(scriptDepContent.name, scriptDepContent);
+                    (<any>inst).schemaMap.set(scriptArgContent.name, scriptArgContent);
                     (<any>inst).resources.set(scriptContent.src, { loadPromise: Promise.resolve(), isLoaded: true, isContent: false });
                 });
                 it('should call executeScriptResource', async () => {
@@ -205,15 +236,15 @@ describe('NetworkDependencyLoader', () => {
                     }
                     expect(true).toBeFalsy();
                 });
-                it('should get all script dependencies before executing the requested function', async () => {
+                it('should get all script argument dependencies before executing the requested function', async () => {
                     (<any>window).dl_func = function() { return 42; };
                     (<any>window).dl_func2 = function(first: number) { return first + 1; };
-                    let result = await (<any>inst).getContentImpl(scriptDepContent.name);
+                    let result = await (<any>inst).getContentImpl(scriptArgContent.name);
                     expect(result).toBe(43);
                     delete (<any>window).dl_func;
                     delete (<any>window).dl_func2;
                 });
-                it('should fetch script dependencies without waiting for the script network resource', async () => {
+                it('should fetch script argument dependencies without waiting for the script network resource', async () => {
                     let event = {
                         scriptResourceLoaded: () => void(0)
                     };
@@ -222,16 +253,16 @@ describe('NetworkDependencyLoader', () => {
                     (<any>window).dl_func2 = function(first: number) { return first + 1; };
                     spyOn(inst, 'get');
                     spyOn(event, 'scriptResourceLoaded');
-                    let result = await (<any>inst).getContentImpl(scriptDepContent.name);
+                    let result = await (<any>inst).getContentImpl(scriptArgContent.name);
                     expect(inst.get).toHaveBeenCalledWith('script');
                     expect(inst.get).toHaveBeenCalledBefore(<any>event.scriptResourceLoaded);
                     delete (<any>window).dl_func;
                     delete (<any>window).dl_func2;
                 });
-                it('should allow dependencies to return promises', async () => {
+                it('should allow argument dependencies to return promises', async () => {
                     (<any>window).dl_func = function() { return delay(100).then(() => 42); };
                     (<any>window).dl_func2 = function(first: number) { return first + 1; };
-                    let result = await (<any>inst).getContentImpl(scriptDepContent.name);
+                    let result = await (<any>inst).getContentImpl(scriptArgContent.name);
                     expect(result).toBe(43);
                     delete (<any>window).dl_func;
                     delete (<any>window).dl_func2;

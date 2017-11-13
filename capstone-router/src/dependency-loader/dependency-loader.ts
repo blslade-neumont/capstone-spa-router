@@ -33,6 +33,11 @@ export abstract class DependencyLoader {
             if (idx !== -1 || this.schemaMap.has(name)) throw new Error(`Content '${name}' defined twice.`);
             names.push(name);
             
+            let deps = meta.deps;
+            if (!!deps) {
+                if (!Array.isArray(deps) || deps.some(dep => typeof dep !== 'string')) throw new Error(`A dependency's 'deps' property should be an array of strings.`);
+            }
+            
             let src = meta.src;
             let type = meta.type;
             if (type === 'text') {
@@ -46,6 +51,11 @@ export abstract class DependencyLoader {
                 if (idx !== -1) throw new Error(`Resource at '${src}' is loaded as a script and as content`);
                 idx = this.scriptPaths.indexOf(src);
                 if (idx === -1) this.scriptPaths.push(src);
+                
+                let args = (<any>meta).args;
+                if (!!args) {
+                    if (!Array.isArray(args) || args.some(dep => typeof dep !== 'string')) throw new Error(`A script dependency's 'args' property should be an array of strings.`);
+                }
             }
             else throw new Error(`Invalid content type for content '${name}': '${type}'`);
         }

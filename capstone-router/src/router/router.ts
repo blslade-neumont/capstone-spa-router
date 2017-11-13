@@ -11,8 +11,8 @@ import { unescapeHtml } from '../util/unescape-html';
 
 export class Router {
     constructor(
-        private deps: DependencyLoader = new NetworkDependencyLoader(),
-        private platform: PlatformAdapter = new BrowserPlatformAdapter()
+        private _dependencyLoader: DependencyLoader = new NetworkDependencyLoader(),
+        private _platformAdapter: PlatformAdapter = new BrowserPlatformAdapter()
     ) {
         this._navigationObservable = this._navigationSubject
             .asObservable();
@@ -24,7 +24,7 @@ export class Router {
         });
         
         this.initPromise = new Promise((resolve, reject) => {
-            this.platform.runOnInit(() => {
+            this._platformAdapter.runOnInit(() => {
                 try { resolve(this.init()); }
                 catch (e) { reject(e); }
             });
@@ -43,21 +43,21 @@ export class Router {
         this.initNavigation();
     }
     private async initPlatform() {
-        await this.platform.initRouter(this, this.eventsSubject);
+        await this._platformAdapter.initRouter(this, this.eventsSubject);
     }
     private initNavigation() {
         this._navigationObservable.subscribe(([route, path, pushState]) => {
-            this.platform.performNavigation(route, path, pushState);
+            this._platformAdapter.performNavigation(route, path, pushState);
         });
         let location = this.platformAdapter.location;
         this.navigateTo(location.pathname, false, true);
     }
     
     get dependencyLoader() {
-        return this.deps;
+        return this._dependencyLoader;
     }
     get platformAdapter() {
-        return this.platform;
+        return this._platformAdapter;
     }
     
     private isLoadingRoutes = false;
