@@ -107,13 +107,19 @@ export class Router {
         if ((<any>route).__referenced__) throw new Error(`The router routes cannot be self-referential!`);
         (<any>route).__referenced__ = true;
         if (typeof route.path !== 'string') throw new Error(`Routes must have path values that are strings. Not ${route.path}`);
-        if (typeof route.template !== 'string') {
-            let template = route.template;
-            if (!template) throw new Error(`All routes must have templates!`);
-            if (typeof (<any>template).dep !== 'string' && typeof (<any>template).factory !== 'string') throw new Error(`Route templates must be strings, or { dep: string }, or { factory: string }`);
-        }
+        this.validateReference(route.template, 'template', false);
+        this.validateReference(route.title, 'title', true);
         if (route.children) {
             this.validateRoutes(route.children);
+        }
+    }
+    private validateReference(ref: any, semantics: string, allowNull: boolean) {
+        if (!ref) {
+            if (!allowNull) throw new Error(`All routes must have ${semantics}s`);
+            return;
+        }
+        if (typeof ref !== 'string') {
+            if (typeof ref.dep !== 'string' && typeof ref.factory !== 'string') throw new Error(`Route ${semantics}s must be strings, or { dep: string }, or { factory: string }`);
         }
     }
     async getRoutes(awaitRoutes = false): Promise<RouteEntryT[]> {
@@ -142,59 +148,31 @@ export class Router {
     }
     
     async loadRouteTemplateAndTitle(route: RouteEntryT[] | null, path: string): Promise<[string, string]> {
-        let tpl: string[];
-        let title: string[];
         if (!route) {
-            tpl = ['Not found'];
-            title = ['Not Found'];
+            return ['Not found', 'Not Found'];
         }
         else {
             let allPathSegments = path.split('/').filter(Boolean);
-            tpl = await this.resolveRouteTemplates(route, path, allPathSegments);
-            title = await this.resolveRouteTitle(route, allPathSegments);
+            let [tpls, titles] = await this.resolveRouteTemplatesAndTitles(route, path, allPathSegments);
+            return [this.mergeTemplates(tpls), this.mergeTitles(titles)];
         }
-        return [this.mergeTemplates(tpl), this.mergeTitles(title)];
     }
-    private async resolveRouteTemplates(route: RouteEntryT[] | null, path: string, allPathSegments: string[]): Promise<string[]> {
-        return await Promise.all(route.map(async (rt, idx) => {
-            let tpl = rt.template;
+    private async resolveRouteTemplatesAndTitles(route: RouteEntryT[] | null, path: string, allPathSegments: string[]): Promise<[string[], string[]]> {
+         let routeTemplateTitles = await Promise.all(route.map(async (rt, idx) => {
             let allRouteSegments = (<string[]>[]).concat(...route.slice(0, idx + 1).map(rt => rt.path.split('/').filter(Boolean)));
             let params = this.calculateRouteParams(allRouteSegments, allPathSegments);
-            if (typeof tpl !== 'string') {
-                let dep = <string>(<any>tpl).dep,
-                    factory = <string>(<any>tpl).factory;
-                let result: any;
-                if (dep) {
-                    result = await this.dependencyLoader.get(dep);
-                }
-                else if (factory) {
-                    result = await this.dependencyLoader.get(factory);
-                    if (typeof result !== 'function') throw new Error(`Route template factory must be a function! Invalid template: '${result}'`);
-                }
-                else throw new Error(`Invalid template parameter: ${tpl}`);
-                if (typeof result === 'function') {
-                    result = result(path, params);
-                    if (result && result.then) result = await result;
-                }
-                if (typeof result !== 'string') throw new Error(`Route template must be a string! Invalid template: '${result}'`);
-                tpl = result;
-            }
-            tpl = this.replaceRouteParamReferences(tpl, params);
-            return tpl;
-        }));
-    }
-    private async resolveRouteTitle(route: RouteEntryT[] | null, allPathSegments: string[]) {
-        let results = await Promise.all(route.map(async (rt, idx) => {
-            let title = rt.title;
-            let allRouteSegments = (<string[]>[]).concat(...route.slice(0, idx + 1).map(rt => rt.path.split('/').filter(Boolean)));
-            let params = this.calculateRouteParams(allRouteSegments, allPathSegments);
-            if (title && typeof title !== 'string') {
-                throw new Error(`Not implemented. Title must be string or undefined`);
-            }
+            let [tpl, title] = await Promise.all([
+                this.resolveReference(rt.template, 'Route template', path, params),
+                this.resolveReference(rt.title, 'Route title', path, params)
+            ]);
+            tpl = tpl && this.replaceRouteParamReferences(tpl, params);
             title = title && unescapeHtml(this.replaceRouteParamReferences(title, params));
-            return title;
+            return <[string, string]>[tpl, title];
         }));
-        return results.filter(Boolean);
+        return [
+            routeTemplateTitles.map(([tpl, _]) => tpl),
+            routeTemplateTitles.map(([_, title]) => title).filter(Boolean)
+        ];
     }
     private calculateRouteParams(routeSegments: string[], pathSegments: string[]): { [key: string]: string } {
         let params: { [key: string]: string } = {};
@@ -211,6 +189,29 @@ export class Router {
             pathIdx++;
         }
         return params;
+    }
+    private async resolveReference(ref: any, semantics: string, path: string, params: { [key: string]: string }): Promise<string> {
+        if (!ref) return ref;
+        if (typeof ref !== 'string') {
+            let dep = <string>(<any>ref).dep,
+                factory = <string>(<any>ref).factory;
+            let result: any;
+            if (dep) {
+                result = await this.dependencyLoader.get(dep);
+            }
+            else if (factory) {
+                result = await this.dependencyLoader.get(factory);
+                if (typeof result !== 'function') throw new Error(`${semantics} factory must be a function! Invalid reference: '${result}'`);
+            }
+            else throw new Error(`Invalid template parameter: ${ref}`);
+            if (typeof result === 'function') {
+                result = result(path, params);
+                if (result && result.then) result = await result;
+            }
+            if (typeof result !== 'string') throw new Error(`${semantics} must be a string! Invalid reference: '${result}'`);
+            ref = result;
+        }
+        return <string>ref;
     }
     private replaceRouteParamReferences(body: string, params: { [key: string]: string }): string {
         let keys = Object.keys(params);

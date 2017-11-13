@@ -45,13 +45,17 @@
                     "type": "string"
                 },
                 "title": {
-                    "type": "string"
+                    "oneOf": [
+                        { "type": "string" },
+                        { "$ref": "#/definitions/dep-reference" },
+                        { "$ref": "#/definitions/factory-reference" }
+                    ]
                 },
                 "template": {
                     "oneOf": [
                         { "type": "string" },
-                        { "$ref": "#/definitions/template-dep" },
-                        { "$ref": "#/definitions/template-factory" }
+                        { "$ref": "#/definitions/dep-reference" },
+                        { "$ref": "#/definitions/factory-reference" }
                     ]
                 },
                 "children": {
@@ -65,7 +69,7 @@
             },
             "required": ["path", "template"]
         },
-        "template-dep": {
+        "dep-reference": {
             "type": "object",
             "properties": {
                 "dep": {
@@ -74,7 +78,7 @@
             },
             "required": ["dep"]
         },
-        "template-factory": {
+        "factory-reference": {
             "type": "object",
             "properties": {
                 "factory": {

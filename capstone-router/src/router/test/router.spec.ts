@@ -151,6 +151,17 @@ describe('Router', () => {
             expect(() => (<any>inst).validateRoute({ path: '/', template: { dep: 'name' } })).not.toThrow();
             expect(() => (<any>inst).validateRoute({ path: '/', template: { factory: 'name' } })).not.toThrow();
         });
+        it('should not fail if the route does not have a title', () => {
+            expect(() => (<any>inst).validateRoute({ path: '/', template: 'name' })).not.toThrow();
+        });
+        it('should fail if the route has an invalid title ref', () => {
+            expect(() => (<any>inst).validateRoute({ path: '/', template: 'name', title: 42 })).toThrowError(/title.* must be.*/i);
+            expect(() => (<any>inst).validateRoute({ path: '/', template: 'name', title: { dep: 42 } })).toThrowError(/title.* must be.*/i);
+            expect(() => (<any>inst).validateRoute({ path: '/', template: 'name', title: { factory: 42 } })).toThrowError(/title.* must be.*/i);
+            expect(() => (<any>inst).validateRoute({ path: '/', template: 'name', title: 'name' })).not.toThrow();
+            expect(() => (<any>inst).validateRoute({ path: '/', template: 'name', title: { dep: 'name' } })).not.toThrow();
+            expect(() => (<any>inst).validateRoute({ path: '/', template: 'name', title: { factory: 'name' } })).not.toThrow();
+        });
         it('should invoke validateRoute on each child route', () => {
             spyOn(<any>inst, 'validateRoute').and.callThrough();
             (<any>inst).validateRoute({ path: 'orange', template: 'myTemplate', children: cloneDeep(tripleRoutes) });
