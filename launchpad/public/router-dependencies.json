@@ -4,7 +4,10 @@
         {"path": "", "template": { "dep": "layout-tpl" }, "children": [
             {"path": "/", "title": "Capstone Presentation", "template": { "dep": "home-tpl" }},
             {"path": "problem-definition", "title": "Problem Definition", "template": "", "children": [
-                {"path": "", "template": {"dep": "pd-typical-workflow-tpl"}},
+                {"path": "", "template": {"dep": "pd-title-tpl"}},
+                {"path": "cause", "template": {"dep": "pd-cause-tpl"}},
+                {"path": "problem", "template": {"dep": "pd-problem-tpl"}},
+                {"path": "typical", "template": {"dep": "pd-typical-workflow-tpl"}},
                 {"path": "spa", "template": {"dep": "pd-spa-workflow-tpl"}},
                 {"path": "capstone", "template": {"dep": "pd-capstone-workflow-tpl"}}
             ]},
@@ -25,6 +28,18 @@
         "name": "home-tpl",
         "type": "text",
         "src": "/templates/home.tpl.html"
+    }, {
+        "name": "pd-title-tpl",
+        "type": "text",
+        "src": "/templates/problem-definition/title.tpl.html"
+    }, {
+        "name": "pd-cause-tpl",
+        "type": "text",
+        "src": "/templates/problem-definition/cause.tpl.html"
+    }, {
+        "name": "pd-problem-tpl",
+        "type": "text",
+        "src": "/templates/problem-definition/problem.tpl.html"
     }, {
         "name": "pd-typical-workflow-tpl",
         "type": "text",

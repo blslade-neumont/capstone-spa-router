@@ -1,4 +1,24 @@
 import { Router } from '@aboveyou00/capstone-router';
+import 'rxjs/add/operator/filter';
+
+function beginCountups(router: Router) {
+    let interval: any = null;
+    router.events.subscribe(ev => {
+        if (ev.type === 'begin') {
+            if (interval) clearInterval(interval);
+            interval = null;
+        }
+        else if (ev.type === 'end') {
+            let count = 3;
+            let countup = document.getElementById("countup");
+            if (countup !== null) {
+                interval = setInterval(() => {
+                    countup.innerHTML = ++count + '';
+                }, 1000);
+            }
+        }
+    });
+}
 
 (async () => {
     let router = new Router();
@@ -7,4 +27,6 @@ import { Router } from '@aboveyou00/capstone-router';
     (<any>window).navigateTo = router.navigateTo.bind(router);
     await router.dependencyLoader.loadSchema('/router-dependencies.json');
     await router.loadRoutes('routes');
+    
+    beginCountups(router);
 })();
