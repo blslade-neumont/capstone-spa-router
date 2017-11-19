@@ -1,8 +1,20 @@
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 import { Router } from '../router';
 import { RouteEntryT } from '../schema';
+import { RouterEventT } from '../events';
 
 export class MockRouter {
-    constructor() { }
+    constructor(
+        private allRoutes: RouteEntryT[]
+    ) { }
+    
+    protected eventsSubject = new Subject<RouterEventT>();
+    readonly events = this.eventsSubject.asObservable();
+    
+    getRoutes() {
+        return Promise.resolve(this.allRoutes);
+    }
     
     navigateTo(url: string | string[], pushState = true, awaitRoutes = false) { }
     
@@ -19,6 +31,6 @@ export class MockRouter {
     }
 }
 
-export function createMockRouter(): Router {
-    return <any>new MockRouter();
+export function createMockRouter(routes: RouteEntryT[] = []): Router {
+    return <any>new MockRouter(routes);
 }
