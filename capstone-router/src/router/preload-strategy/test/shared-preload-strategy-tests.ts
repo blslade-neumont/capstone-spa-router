@@ -35,10 +35,10 @@ export function sharedPreloadStrategyTests<T extends PreloadStrategy>(factoryFn:
             });
         });
         
-        describe('.preloadRoute', () => {
+        describe('.preloadRoutes', () => {
             it('should throw an error if the preload strategy has not been initialized', async () => {
                 try {
-                    inst.preloadRoute([])
+                    inst.preloadRoutes([])
                 }
                 catch (e) {
                     expect(e.message).toMatch(/preload strategy.* not initialized/i);
@@ -53,7 +53,7 @@ export function sharedPreloadStrategyTests<T extends PreloadStrategy>(factoryFn:
                     { path: '', title: 'Some Title', template: { dep: 'template-dep' } },
                     { path: ':slug', title: { factory: 'title-factory-dep' }, template: { dep: 'template-dep-2' } }
                 ];
-                await inst.preloadRoute(routes);
+                await inst.preloadRoutes(routes);
                 expect(dependencyLoader.get).toHaveBeenCalledTimes(3);
                 expect(dependencyLoader.get).toHaveBeenCalledWith('template-dep');
                 expect(dependencyLoader.get).toHaveBeenCalledWith('title-factory-dep');
@@ -61,11 +61,11 @@ export function sharedPreloadStrategyTests<T extends PreloadStrategy>(factoryFn:
             });
             it('should not fail if there are no routes in the array', async () => {
                 inst.init(router);
-                inst.preloadRoute([]);
+                inst.preloadRoutes([]);
             });
             it('should return a promise', () => {
                 inst.init(router);
-                let result = inst.preloadRoute([]);
+                let result = inst.preloadRoutes([]);
                 expect(result instanceof Promise).toBe(true);
             });
             describe('that promise', () => {
@@ -73,7 +73,7 @@ export function sharedPreloadStrategyTests<T extends PreloadStrategy>(factoryFn:
                     inst.init(router);
                     spyOn((<any>inst), 'logError');
                     spyOn(dependencyLoader, 'get').and.returnValue(Promise.reject('Oops!'));
-                    await inst.preloadRoute([{ path: '', template: { dep: 'some-dep' } }]);
+                    await inst.preloadRoutes([{ path: '', template: { dep: 'some-dep' } }]);
                     expect(dependencyLoader.get).toHaveBeenCalledWith('some-dep');
                     expect((<any>inst).logError).toHaveBeenCalledTimes(1);
                 });

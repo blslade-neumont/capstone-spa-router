@@ -17,7 +17,7 @@ export abstract class PreloadStrategy {
     }
     protected abstract initImpl(): Promise<void> | void;
     
-    async preloadRoute(routes: RouteEntryT[]): Promise<void> {
+    async preloadRoutes(routes: RouteEntryT[]): Promise<void> {
         if (!this.router) throw new Error(`Can't preload routes. The preload strategy is not initialized.`);
         try {
             let deps: string[] = [];
