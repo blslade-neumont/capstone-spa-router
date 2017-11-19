@@ -21,7 +21,7 @@ describe('PreloadEverythingStrategy', () => {
         let router: Router;
         let inst: PreloadEverythingStrategy;
         let dependencyLoader: DependencyLoader;
-        let eventsSubject: Subject<RouterEventT>
+        let eventsSubject: Subject<RouterEventT>;
         let routes: RouteEntryT[];
         beforeEach(() => {
             inst = new PreloadEverythingStrategy();
@@ -34,6 +34,7 @@ describe('PreloadEverythingStrategy', () => {
         it('should not preload anything before the first route has been loaded', async () => {
             spyOn(inst, 'preloadRoutes');
             await inst.init(router);
+            await delay(10);
             expect(inst.preloadRoutes).not.toHaveBeenCalled();
         });
         it('should preload all other routes when the first navigation end event is fired', async () => {
