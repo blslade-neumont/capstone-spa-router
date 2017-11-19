@@ -6,6 +6,7 @@ import { RouterOptions } from './router-options';
 import { NavigationProgressOptions } from './navigation-progress-options';
 import { DependencyLoader, NetworkDependencyLoader } from '../dependency-loader';
 import { PlatformAdapter, BrowserPlatformAdapter } from './platform-adapter';
+import { PreloadStrategy, createPreloadStrategy } from './preload-strategy';
 import { RouteEntryT } from './schema';
 import { RouterEventT, NavigationProgressEventT } from './events';
 import { unescapeHtml } from '../util/unescape-html';
@@ -15,6 +16,7 @@ export class Router {
         opts = opts || {};
         this._dependencyLoader = opts.dependencyLoader || new NetworkDependencyLoader();
         this._platformAdapter = opts.platformAdapter || new BrowserPlatformAdapter();
+        this._preloadStrategy = createPreloadStrategy(opts.preloadStrategy);
         
         this._navigationObservable = this._navigationSubject
             .asObservable();
@@ -38,9 +40,6 @@ export class Router {
         })).subscribe(this.eventsSubject);
     }
     
-    private _dependencyLoader: DependencyLoader;
-    private _platformAdapter: PlatformAdapter;
-    
     protected progressSubject = new Subject<number>();
     protected eventsSubject = new Subject<RouterEventT>();
     readonly events = this.eventsSubject.asObservable();
@@ -51,10 +50,14 @@ export class Router {
     }
     protected async init() {
         await this.initPlatform();
+        await this.initLoadingStrategy();
         this.initNavigation();
     }
     private async initPlatform() {
         await this._platformAdapter.initRouter(this, this.eventsSubject);
+    }
+    private async initLoadingStrategy() {
+        await this._preloadStrategy.init(this);
     }
     private initNavigation() {
         this._navigationObservable.subscribe(([route, path, pushState]) => {
@@ -119,11 +122,18 @@ export class Router {
         });
     }
     
+    private _dependencyLoader: DependencyLoader;
+    private _platformAdapter: PlatformAdapter;
+    private _preloadStrategy: PreloadStrategy;
+    
     get dependencyLoader() {
         return this._dependencyLoader;
     }
     get platformAdapter() {
         return this._platformAdapter;
+    }
+    get preloadStrategy() {
+        return this._preloadStrategy;
     }
     
     private isLoadingRoutes = false;

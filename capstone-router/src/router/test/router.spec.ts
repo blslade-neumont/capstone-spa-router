@@ -28,7 +28,8 @@ describe('Router', () => {
         _history = (<any>platformAdapter)._history = createMockHistory();
         inst = new Router({
             dependencyLoader: deps,
-            platformAdapter: platformAdapter
+            platformAdapter: platformAdapter,
+            preloadStrategy: 'none'
         });
     });
     
