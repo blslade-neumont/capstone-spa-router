@@ -4,7 +4,7 @@ import cloneDeep = require('lodash.clonedeep');
 
 import { Router } from '../router';
 import { DummyDependencyLoader } from '../../dependency-loader/dummy-dependency-loader';
-import { BrowserPlatformAdapter } from '../browser-platform-adapter';
+import { BrowserPlatformAdapter } from '../platform-adapter/browser-platform-adapter';
 import { RouteEntryT } from '../schema';
 import { createMockDocument } from './mock-document';
 import { createMockWindow } from './mock-window';
@@ -26,7 +26,10 @@ describe('Router', () => {
         (<any>_document).location = { protocol: 'http:', host: 'localhost:8080', pathname: '/a/b/c' };
         _window = (<any>platformAdapter)._window = createMockWindow();
         _history = (<any>platformAdapter)._history = createMockHistory();
-        inst = new Router(deps, platformAdapter);
+        inst = new Router({
+            dependencyLoader: deps,
+            platformAdapter: platformAdapter
+        });
     });
     
     describe('.ensureInitialized', () => {

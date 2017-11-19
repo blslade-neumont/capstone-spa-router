@@ -1,8 +1,8 @@
 import { Subject } from 'rxjs/Subject';
 import { PlatformAdapter } from './platform-adapter';
-import { Router } from './router';
-import { RouteEntryT } from './schema';
-import { RouterEventT } from './events';
+import { Router } from '../router';
+import { RouteEntryT } from '../schema';
+import { RouterEventT } from '../events';
 
 export class BrowserPlatformAdapter extends PlatformAdapter {
     constructor(private debugHistory = false) {

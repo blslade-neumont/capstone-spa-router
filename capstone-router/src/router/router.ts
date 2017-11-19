@@ -2,22 +2,20 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/map';
+import { RouterOptions } from './router-options';
+import { NavigationProgressOptions } from './navigation-progress-options';
 import { DependencyLoader, NetworkDependencyLoader } from '../dependency-loader';
-import { PlatformAdapter } from './platform-adapter';
-import { BrowserPlatformAdapter } from './browser-platform-adapter';
+import { PlatformAdapter, BrowserPlatformAdapter } from './platform-adapter';
 import { RouteEntryT } from './schema';
 import { RouterEventT, NavigationProgressEventT } from './events';
 import { unescapeHtml } from '../util/unescape-html';
 
-export type NavigationProgressOptions = {
-    color?: string
-};
-
 export class Router {
-    constructor(
-        private _dependencyLoader: DependencyLoader = new NetworkDependencyLoader(),
-        private _platformAdapter: PlatformAdapter = new BrowserPlatformAdapter()
-    ) {
+    constructor(opts?: RouterOptions) {
+        opts = opts || {};
+        this._dependencyLoader = opts.dependencyLoader || new NetworkDependencyLoader();
+        this._platformAdapter = opts.platformAdapter || new BrowserPlatformAdapter();
+        
         this._navigationObservable = this._navigationSubject
             .asObservable();
         this._currentRoute = this._navigationObservable
@@ -39,6 +37,9 @@ export class Router {
             progress: progress
         })).subscribe(this.eventsSubject);
     }
+    
+    private _dependencyLoader: DependencyLoader;
+    private _platformAdapter: PlatformAdapter;
     
     protected progressSubject = new Subject<number>();
     protected eventsSubject = new Subject<RouterEventT>();
@@ -63,9 +64,9 @@ export class Router {
         this.navigateTo(location.pathname, false, true);
     }
     
-    addNavigationProgressBar(opts?: NavigationProgressOptions, document?: HTMLDocument) {
+    addNavigationProgressBar(opts?: NavigationProgressOptions) {
         if (!opts) opts = {};
-        if (!document) document = window.document;
+        let document = opts.document || window.document;
         
         let progressRoot = document.createElement('div');
         progressRoot.classList.add('router-navigation-progress-root');

@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs/Subject';
-import { RouterEventT } from './events';
-import { RouteEntryT } from './schema';
-import { Router } from './router';
+import { RouterEventT } from '../events';
+import { RouteEntryT } from '../schema';
+import { Router } from '../router';
 
 export abstract class PlatformAdapter {
     constructor() { }

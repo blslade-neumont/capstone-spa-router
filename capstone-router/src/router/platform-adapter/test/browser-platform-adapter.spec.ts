@@ -6,13 +6,13 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { BrowserPlatformAdapter } from '../browser-platform-adapter';
 import { sharedPlatformAdapterTests } from './shared-platform-adapter-tests';
-import { createMockDocument } from './mock-document';
-import { createMockWindow } from './mock-window';
-import { createMockHistory } from './mock-history';
-import { createMockRouter } from './mock-router';
-import { RouterEventT } from '../events';
-import { Router } from '../router';
-import { delay } from '../../util/delay';
+import { createMockDocument } from '../../test/mock-document';
+import { createMockWindow } from '../../test/mock-window';
+import { createMockHistory } from '../../test/mock-history';
+import { createMockRouter } from '../../test/mock-router';
+import { RouterEventT } from '../../events';
+import { Router } from '../../router';
+import { delay } from '../../../util/delay';
 
 let anything = jasmine.anything();
 
