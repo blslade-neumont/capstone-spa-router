@@ -5,5 +5,5 @@ export class PreloadNothingStrategy extends PreloadStrategy {
         super();
     }
     
-    async init() { }
+    async initImpl() { }
 }

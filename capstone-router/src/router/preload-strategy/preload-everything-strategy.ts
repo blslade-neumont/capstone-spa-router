@@ -5,7 +5,7 @@ export class PreloadEverythingStrategy extends PreloadStrategy {
         super();
     }
     
-    async init() {
+    async initImpl() {
         
     }
 }

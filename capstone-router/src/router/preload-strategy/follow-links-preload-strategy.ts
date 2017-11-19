@@ -5,7 +5,7 @@ export class FollowLinksPreloadStrategy extends PreloadStrategy {
         super();
     }
     
-    async init() {
+    async initImpl() {
         
     }
 }
