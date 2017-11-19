@@ -1,8 +1,8 @@
 /// <reference types="jasmine" />
 
-import { PlatformAdapter } from '../platform-adapter';
+import { PreloadStrategy } from '../preload-strategy';
 
-export function sharedPlatformAdapterTests<T extends PlatformAdapter>(factoryFn: () => T, cleanupFn?: (inst: T) => void) {
+export function sharedPreloadStrategyTests<T extends PreloadStrategy>(factoryFn: () => T, cleanupFn?: (inst: T) => void) {
     describe('shared functionality', () => {
         let inst: T;
         beforeEach(() => {
