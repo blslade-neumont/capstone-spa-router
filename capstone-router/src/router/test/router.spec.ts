@@ -5,6 +5,7 @@ import cloneDeep = require('lodash.clonedeep');
 import { Router } from '../router';
 import { DummyDependencyLoader } from '../../dependency-loader/dummy-dependency-loader';
 import { BrowserPlatformAdapter } from '../platform-adapter/browser-platform-adapter';
+import { PreloadStrategy } from '../preload-strategy/preload-strategy';
 import { RouteEntryT } from '../schema';
 import { createMockDocument } from './mock-document';
 import { createMockWindow } from './mock-window';
@@ -18,6 +19,7 @@ describe('Router', () => {
     let _document: Document;
     let _window: Window;
     let _history: History;
+    let preloadStrategy: PreloadStrategy;
     beforeEach(() => {
         deps = new DummyDependencyLoader();
         platformAdapter = new BrowserPlatformAdapter();
@@ -31,6 +33,7 @@ describe('Router', () => {
             platformAdapter: platformAdapter,
             preloadStrategy: 'none'
         });
+        preloadStrategy = inst.preloadStrategy;
     });
     
     describe('.ensureInitialized', () => {
@@ -58,6 +61,12 @@ describe('Router', () => {
             (<any>_document).emitEvent('DOMContentLoaded', {});
             await inst.ensureInitialized();
             expect(platformAdapter.initRouter).toHaveBeenCalledWith(inst, jasmine.anything());
+        });
+        it('should initialize the preload strategy', async () => {
+            spyOn(preloadStrategy, 'init').and.returnValue(Promise.resolve(void(0)));
+            (<any>_document).emitEvent('DOMContentLoaded', {});
+            await inst.ensureInitialized();
+            expect(preloadStrategy.init).toHaveBeenCalledWith(inst);
         });
         it('should begin navigating to the current location pathname', async () => {
             spyOn(inst, 'navigateTo');
