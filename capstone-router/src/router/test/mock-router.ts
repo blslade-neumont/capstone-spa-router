@@ -29,6 +29,10 @@ export class MockRouter {
     completeNavigationProgress(idx: number) {
         return this.currentNavigationIndex === idx;
     }
+    
+    findBestRoute() {
+        throw new Error(`MockRouter does not support findBestRoute`);
+    }
 }
 
 export function createMockRouter(routes: RouteEntryT[] = []): Router {

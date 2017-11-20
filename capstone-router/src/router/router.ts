@@ -372,7 +372,7 @@ export class Router {
         return true;
     }
     
-    private async findBestRoute(segments: string[]): Promise<RouteEntryT[] | null> {
+    async findBestRoute(segments: string[]): Promise<RouteEntryT[] | null> {
         let routes = await this.getRoutes();
         return this.findFirstMatch(segments, routes, true);
     }

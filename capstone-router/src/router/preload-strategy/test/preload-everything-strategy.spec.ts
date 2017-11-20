@@ -43,16 +43,16 @@ describe('PreloadEverythingStrategy', () => {
             routes.push({path: '/', template: 'ROOT'});
             routes.push({path: 'fish', template: 'FISH'});
             routes.push({path: 'donkey', template: 'DONKEY'});
-            eventsSubject.next({ type: 'end', route: [], path: '' });
+            eventsSubject.next({ type: 'end', route: [], path: '', template: '', title: '' });
             await delay(10);
             expect(inst.preloadRoutes).toHaveBeenCalledWith(routes);
         });
         it('should not preload again upon subsequent navigation end events', async () => {
             await inst.init(router);
-            eventsSubject.next({ type: 'end', route: [], path: '' });
+            eventsSubject.next({ type: 'end', route: [], path: '', template: '', title: '' });
             await delay(10);
             spyOn(inst, 'preloadRoutes');
-            eventsSubject.next({ type: 'end', route: [], path: 'abc' });
+            eventsSubject.next({ type: 'end', route: [], path: 'abc', template: '', title: '' });
             await delay(10);
             expect(inst.preloadRoutes).not.toHaveBeenCalled();
         });
@@ -63,7 +63,7 @@ describe('PreloadEverythingStrategy', () => {
                 {path: 'fish', template: 'FISH'},
                 {path: 'donkey', template: 'DONKEY'}
             ]});
-            eventsSubject.next({ type: 'end', route: [], path: 'abc' });
+            eventsSubject.next({ type: 'end', route: [], path: 'abc', template: '', title: '' });
             await delay(10);
             expect(inst.preloadRoutes).toHaveBeenCalledWith([...routes, ...routes[0].children]);
         });

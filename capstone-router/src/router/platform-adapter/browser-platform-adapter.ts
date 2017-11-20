@@ -3,6 +3,7 @@ import { PlatformAdapter } from './platform-adapter';
 import { Router } from '../router';
 import { RouteEntryT } from '../schema';
 import { RouterEventT } from '../events';
+import { resolveLocalHref } from '../../util/resolve-local-href';
 
 export class BrowserPlatformAdapter extends PlatformAdapter {
     constructor(private debugHistory = false) {
@@ -56,7 +57,7 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
             if (e.target instanceof HTMLAnchorElement) {
                 let href: string | null = e.target.href;
                 let location = this._document.location;
-                href = this.resolveLocalHref(location.protocol + '//' + location.host, location.pathname, href);
+                href = resolveLocalHref(location.protocol + '//' + location.host, location.pathname, href);
                 if (href) {
                     e.preventDefault();
                     this.router.navigateTo(href);
@@ -112,30 +113,9 @@ export class BrowserPlatformAdapter extends PlatformAdapter {
         this.eventsSubject.next({
             type: 'end',
             route: route,
-            path: path
+            path: path,
+            template: tpl,
+            title: title
         });
-    }
-    
-    private resolveLocalHref(host: string, path: string, href: string): string | null {
-        if (href.startsWith(host)) href = href.substr(host.length);
-        if (href.match(/^[a-z0-9]+\:/i)) return null;
-        else if (href.startsWith('/')) return href;
-        
-        let lastIdx: number;
-        href = '../' + href;
-        while (true) {
-            if (href.startsWith('../')) {
-                let lastIdx = path.lastIndexOf('/');
-                if (lastIdx === -1) return null;
-                path = path.substr(0, lastIdx);
-                href = href.substr(3);
-            }
-            else if (href.startsWith('./')) {
-                href = href.substr(2);
-            }
-            else break;
-        }
-        
-        return path + '/' + href;
     }
 }

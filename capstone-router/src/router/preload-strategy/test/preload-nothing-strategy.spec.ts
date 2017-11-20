@@ -38,7 +38,7 @@ describe('PreloadNothingStrategy', () => {
         it('should not preload anything when the first navigation end event is fired', async () => {
             await inst.init(router);
             spyOn(inst, 'preloadRoutes');
-            eventsSubject.next({ type: 'end', route: [], path: '' });
+            eventsSubject.next({ type: 'end', route: [], path: '', template: '', title: '' });
             await delay(10);
             expect(inst.preloadRoutes).not.toHaveBeenCalled();
         });

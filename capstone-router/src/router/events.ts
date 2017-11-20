@@ -12,7 +12,9 @@ export type NavigationProgressEventT = {
 export type NavigationEndEventT = {
     type: 'end',
     route: RouteEntryT[] | null,
-    path: string
+    path: string,
+    template: string,
+    title: string
 };
 
 export type NavigationEventT = NavigationBeginEventT | NavigationProgressEventT | NavigationEndEventT;

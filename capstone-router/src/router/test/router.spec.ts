@@ -229,16 +229,16 @@ describe('Router', () => {
             await inst.loadRoutes(cloneDeep(tripleRoutes));
         });
         it('should invoke findBestRoute with the url split into segments', async () => {
-            spyOn(<any>inst, 'findBestRoute');
+            spyOn(inst, 'findBestRoute');
             await inst.loadRoutes(cloneDeep(tripleRoutes));
             await inst.navigateTo('/about/some/thing');
-            expect((<any>inst).findBestRoute).toHaveBeenCalledWith(['about', 'some', 'thing']);
+            expect(inst.findBestRoute).toHaveBeenCalledWith(['about', 'some', 'thing']);
         });
         it('should treat the root as a single forward slash path segment', async () => {
-            spyOn(<any>inst, 'findBestRoute');
+            spyOn(inst, 'findBestRoute');
             await inst.loadRoutes(cloneDeep(tripleRoutes));
             await inst.navigateTo('/');
-            expect((<any>inst).findBestRoute).toHaveBeenCalledWith(['/']);
+            expect(inst.findBestRoute).toHaveBeenCalledWith(['/']);
         });
         it('should try to navigate to the matched path (or null if none matched)', async () => {
             let navs: any[] = [];
@@ -624,15 +624,13 @@ describe('Router', () => {
     });
     
     describe('.findBestRoute', () => {
-        let fn: (segments: string[]) => Promise<any[] | null>;
         beforeEach(() => {
             (<any>_document).emitEvent('DOMContentLoaded', {});
-            fn = (<any>inst).findBestRoute.bind(inst);
         });
         
         it('should fail if no routes have been loaded', async () => {
             try {
-                await fn(['/']);
+                await inst.findBestRoute(['/']);
             }
             catch (e) {
                 expect(e.message).toMatch(/no routes.* loaded/i);
@@ -643,12 +641,12 @@ describe('Router', () => {
         it('should return the first route that matches the path segments', async () => {
             let single = cloneDeep(singleRoute)[0];
             await inst.loadRoutes([single, cloneDeep(single)]);
-            let result = await fn(['/']);
+            let result = await inst.findBestRoute(['/']);
             expect(result).toEqual([single]);
         });
         it('should return null if no route matches the path segments', async () => {
             await inst.loadRoutes(cloneDeep(tripleRoutes));
-            let result = await fn(['fish', 'kisses']);
+            let result = await inst.findBestRoute(['fish', 'kisses']);
             expect(result).toEqual(null);
         });
     });
