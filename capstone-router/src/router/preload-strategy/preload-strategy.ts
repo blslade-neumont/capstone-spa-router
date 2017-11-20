@@ -1,8 +1,11 @@
 import { Router } from '../router';
 import { RouteEntryT } from '../schema';
+import { delay } from '../../util/delay';
 
 export abstract class PreloadStrategy {
     constructor() { }
+    
+    public delayPreloadMillis = 0;
     
     private _router: Router;
     protected get router() {
@@ -19,6 +22,7 @@ export abstract class PreloadStrategy {
     
     async preloadRoutes(routes: RouteEntryT[]): Promise<void> {
         if (!this.router) throw new Error(`Can't preload routes. The preload strategy is not initialized.`);
+        if (this.delayPreloadMillis) await delay(this.delayPreloadMillis);
         try {
             let deps: string[] = [];
             for (let route of routes) {
