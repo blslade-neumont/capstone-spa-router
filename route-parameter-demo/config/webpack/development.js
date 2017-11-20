@@ -13,8 +13,17 @@ let $awesomeTypescript = {
 let $style = {
     loader: 'style-loader'
 };
-let $trim = {
-    loader: 'trim-loader'
+let $css = {
+    loader: 'css-loader'
+};
+let $postcss = {
+    loader: 'postcss-loader',
+    options: {
+        plugins: () => [
+            require('precss'),
+            require('autoprefixer')
+        ]
+    }
 };
 let $sass = {
     loader: 'sass-loader',
@@ -44,7 +53,7 @@ let devConfig = {
     module: {
         loaders: [
             { test: /\.ts$/, loaders: [$awesomeTypescript], exclude: /\.spec\.ts$/ },
-            { test: /\.scss$/, loaders: [$style, $trim, $sass] }
+            { test: /\.scss$/, loaders: [$style, $css, $postcss, $sass] }
         ]
     },
 
