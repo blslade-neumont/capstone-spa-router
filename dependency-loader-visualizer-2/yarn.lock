@@ -2,11 +2,12 @@
 # yarn lockfile v1
 
 
-"@aboveyou00/capstone-router@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@aboveyou00/capstone-router/-/capstone-router-0.2.1.tgz#ee602e472f73ba2c642ffe750061fbe61c06c057"
+"@aboveyou00/capstone-router@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@aboveyou00/capstone-router/-/capstone-router-0.3.1.tgz#d47f60460226db8cfbbc15b1126c9b8c8b349c68"
   dependencies:
     "@types/core-js" "^0.9.43"
+    lodash.isequal "^4.5.0"
 
 "@aboveyou00/json-schema-validator@^1.1.1":
   version "1.1.1"
@@ -2188,6 +2189,10 @@ lodash.isarguments@^3.0.0:
 lodash.isarray@^3.0.0:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/lodash.isarray/-/lodash.isarray-3.0.4.tgz#79e4eb88c36a8122af86f844aa9bcd851b5fbb55"
+
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
 
 lodash.keys@^3.0.0:
   version "3.1.2"
