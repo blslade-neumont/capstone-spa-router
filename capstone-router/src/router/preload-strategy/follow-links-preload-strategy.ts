@@ -3,7 +3,7 @@ import 'rxjs/add/operator/filter';
 import { NavigationEndEventT } from '../events';
 import { Router, RouteEntryT } from 'src';
 import { resolveLocalHref } from '../../util/resolve-local-href';
-import isEqual = require('lodash.isEqual');
+import isEqual = require('lodash.isequal');
 
 const hyperlinkRegex = /<a(?: [a-z]+=[^>]*?)*? href="([^">]+)"/g;
 const programmaticRegex = /\.navigateTo ?\( ?["']([^"']+)["'] ?[\),]/g;
