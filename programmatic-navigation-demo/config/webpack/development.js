@@ -13,8 +13,17 @@ let $awesomeTypescript = {
 let $style = {
     loader: 'style-loader'
 };
-let $trim = {
-    loader: 'trim-loader'
+let $css = {
+    loader: 'css-loader'
+};
+let $postcss = {
+    loader: 'postcss-loader',
+    options: {
+        plugins: () => [
+            require('precss'),
+            require('autoprefixer')
+        ]
+    }
 };
 let $sass = {
     loader: 'sass-loader',
@@ -22,6 +31,13 @@ let $sass = {
         includePaths: [
             path.resolve(ROOT, 'src/styles')
         ]
+    }
+};
+let $fontFile = {
+    loader: 'file-loader',
+    options: {
+        outputPath: '../fonts/',
+        emitFile: true
     }
 };
 
@@ -42,7 +58,8 @@ let devConfig = {
     module: {
         loaders: [
             { test: /\.ts$/, loaders: [$awesomeTypescript], exclude: /\.spec\.ts$/ },
-            { test: /\.scss$/, loaders: [$style, $trim, $sass] }
+            { test: /\.scss$/, loaders: [$style, $css, $postcss, $sass] },
+            { test: /\.(eot|svg|ttf|woff2?|otf)(\?.*)?$/, loaders: [$fontFile] }
         ]
     },
 
