@@ -1,0 +1,8 @@
+
+
+test/e2e/screenshots
+test/e2e/reports
+test/e2e/src/**/*.js
+test/e2e/src/**/*.js.map
+
+selenium-debug.log

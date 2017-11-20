@@ -1,0 +1,12 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "src",
+        "outDir": "src",
+        "baseUrl": ".",
+        "types": [
+            "core-js",
+            "nightwatch"
+        ]
+    }
+}

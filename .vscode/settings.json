@@ -6,6 +6,8 @@
         "**/.hg": true,
         "**/CVS": true,
         "**/.DS_Store": true,
-        "**/dist": true
+        "**/dist": true,
+        "**/test/e2e/src/**/*.js": true,
+        "**/test/e2e/src/**/*.js.map": true
     }
 }
