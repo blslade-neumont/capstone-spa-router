@@ -5,7 +5,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '../../');
 
 let server;
 function createServer() {
-    server = spawn(path.resolve(PROJECT_ROOT, './node_modules/.bin/http-server'), ['dist', '-p', '8084', '--push-state', '-c-1', '-d', 'false'], { cwd: PROJECT_ROOT });
+    server = spawn('yarn', ['serve'], { cwd: PROJECT_ROOT });
     return new Promise((resolve, reject) => {
         let resolved = false;
         server.stdout.on('data', data => {
