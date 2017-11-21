@@ -8,6 +8,8 @@
         "**/.DS_Store": true,
         "**/dist": true,
         "**/test/e2e/src/**/*.js": true,
-        "**/test/e2e/src/**/*.js.map": true
+        "**/test/e2e/src/**/*.js.map": true,
+        "**/yarn-error.log": true,
+        "**/selenium-debug.log": true
     }
 }

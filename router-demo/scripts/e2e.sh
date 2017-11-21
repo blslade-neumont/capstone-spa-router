@@ -17,6 +17,6 @@ echo -e "${YELLOW}Starting nightwatch...${NC}"
 nightwatch --config ./test/e2e/nightwatch.conf.js
 
 echo -e "${YELLOW}Cleaning up...${NC}"
-rm selenium-debug.log
+rm -f selenium-debug.log || true
 
 exit 0
