@@ -86,6 +86,27 @@ body {
     animation-duration: 5s;
 }
 
+.computer-right-screen-container {
+    position: absolute;
+    right: 248px;
+    top: calc(50vh - 88px);
+    -webkit-perspective: 200px;
+    perspective: 200px;
+    perspective-origin: 75% 40%;
+    
+    & .computer-right-screen {
+        vertical-align: middle;
+        background: grey;
+        width: 150px;
+        height: 90px;
+        line-height: 90px;
+        font-size: 28px;
+        -webkit-transform: rotateY(45deg);
+        transform: rotateY(45deg);
+        opacity: 0;
+    }
+}
+
 @keyframes fade-in-1 {
     0% {
         opacity: 0;
@@ -136,6 +157,11 @@ body {
             animation-duration: 5s;
             animation-iteration-count: infinite;
         }
+        & .computer-right-screen {
+            animation-name: typical-loading-screen;
+            animation-duration: 5s;
+            animation-iteration-count: infinite;
+        }
     }
     &.spa {
         & .request {
@@ -152,6 +178,11 @@ body {
             left: calc(100vw - 370px);
             top: calc(50vh - 130px);
         }
+        & .computer-right-screen {
+            animation-name: spa-loading-screen;
+            animation-duration: 30s;
+            animation-iteration-count: 1;
+        }
     }
     &.capstone-spa {
         & .request {
@@ -165,6 +196,11 @@ body {
             animation-duration: 5s;
             left: calc(100vw - 370px);
             top: calc(50vh - 130px);
+        }
+        & .computer-right-screen {
+            animation-name: capstone-loading-screen;
+            animation-duration: 5s;
+            animation-iteration-count: 1;
         }
     }
     
@@ -231,6 +267,26 @@ body {
         top: calc(50vh - 130px);
     }
 }
+@keyframes typical-loading-screen {
+    0% {
+        opacity: 0;
+    }
+    9.9% {
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    90.1% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
 
 @keyframes spa-request {
     0% {
@@ -268,6 +324,26 @@ body {
         top: calc(50vh - 130px);
     }
 }
+@keyframes spa-loading-screen {
+    0% {
+        opacity: 0;
+    }
+    1.665% {
+        opacity: 0;
+    }
+    1.666% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    90.1% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
 
 @keyframes capstone-request {
     0% {
@@ -303,5 +379,25 @@ body {
     100% {
         left: calc(100vw - 370px);
         top: calc(50vh - 130px);
+    }
+}
+@keyframes capstone-loading-screen {
+    0% {
+        opacity: 0;
+    }
+    9.9% {
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    90.1% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
     }
 }
