@@ -429,3 +429,34 @@ body {
         opacity: 0;
     }
 }
+
+.technology-list-header {
+    text-align: center;
+}
+.technology-list {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    padding-left: 0;
+    border-spacing: 30px;
+    
+    & > li {
+        display: table-row;
+        list-style: none;
+        margin-left: 0;
+        padding-left: 0;
+        
+        & > * {
+            display: table-cell;
+            
+            &:first-child {
+                text-align: right;
+            }
+            
+            & > img {
+                max-width: 100%;
+                max-height: 80px;
+            }
+        }
+    }
+}

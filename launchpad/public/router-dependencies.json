@@ -9,7 +9,8 @@
                 {"path": "problem", "template": {"dep": "pd-problem-tpl"}},
                 {"path": "typical", "template": {"dep": "pd-typical-workflow-tpl"}},
                 {"path": "spa", "template": {"dep": "pd-spa-workflow-tpl"}},
-                {"path": "capstone", "template": {"dep": "pd-capstone-workflow-tpl"}}
+                {"path": "capstone", "template": {"dep": "pd-capstone-workflow-tpl"}},
+                {"path": "technologies", "template": {"dep": "pd-technologies-used-tpl"}}
             ]},
             {"path": "dependency-loader", "title": "Dependency Loader", "template": { "dep": "dependency-loader-tpl" }},
             {"path": "router", "title": "Router", "template": { "dep": "router-tpl" }},
@@ -52,6 +53,10 @@
         "name": "pd-capstone-workflow-tpl",
         "type": "text",
         "src": "/templates/problem-definition/capstone-spa-workflow.tpl.html"
+    }, {
+        "name": "pd-technologies-used-tpl",
+        "type": "text",
+        "src": "/templates/problem-definition/technologies.tpl.html"
     }, {
         "name": "dependency-loader-tpl",
         "type": "text",
