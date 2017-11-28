@@ -9,11 +9,17 @@ function beginCountups(router: Router) {
             interval = null;
         }
         else if (ev.type === 'end') {
-            let count = 3;
+            let count = 3, countFrom = 3;
             let countup = document.getElementById("countup");
             if (countup !== null) {
                 interval = setInterval(() => {
-                    countup.innerHTML = ++count + '';
+                    --count;
+                    let minCount = Math.floor((countFrom * 2) / 3);
+                    countup.innerHTML = (count < minCount ? minCount : count) + '';
+                    if (count <= minCount - 1) {
+                        countFrom = Math.ceil(countFrom * 1.4);
+                        count = countFrom;
+                    }
                 }, 1000);
             }
         }

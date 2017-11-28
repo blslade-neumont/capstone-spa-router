@@ -22,11 +22,23 @@ body {
     text-align: center;
     width: 100vw;
     height: calc(100vh - 56px);
-}
-.pd-title > h1 {
-    font-size: 80pt;
-    margin-top: calc(50vh - 200px);
-    margin-bottom: 80px;
+    overflow: hidden;
+    cursor: default !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    
+    & > h1 {
+        font-size: 40pt;
+        margin-top: calc(50vh - 200px);
+        margin-bottom: 80px;
+    }
+    & > h3 {
+        font-size: 30pt;
+        margin-top: 60px;
+    }
 }
 
 .pd-cause {
@@ -34,17 +46,25 @@ body {
     height: calc(100vh - 57px);
     text-align: center;
     position: relative;
-}
-.pd-cause > h1 {
-    margin: 20px 0;
-}
-.pd-cause > img {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 40px;
-    bottom: 0;
-    margin: auto;
+    overflow: hidden;
+    cursor: default !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    
+    & > h1 {
+        margin: 20px 0;
+    }
+    & > img {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 40px;
+        bottom: 0;
+        margin: auto;
+    }
 }
 
 .pd-problem {
@@ -52,9 +72,17 @@ body {
     height: calc(100vh - 57px);
     text-align: center;
     position: relative;
-}
-.pd-problem h1 {
-    margin: 20px 0;
+    overflow: hidden;
+    cursor: default !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    
+    & h1 {
+        margin: 20px 0;
+    }
 }
 
 .computer-screen {
