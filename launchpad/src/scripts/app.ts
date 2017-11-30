@@ -13,7 +13,8 @@ function beginCountups(router: Router) {
             let countup = document.getElementById("countup");
             if (countup !== null) {
                 interval = setInterval(() => {
-                    --count;
+                    // --count;
+                    ++count;
                     let minCount = Math.floor((countFrom * 2) / 3);
                     countup.innerHTML = (count < minCount ? minCount : count) + '';
                     if (count <= minCount - 1) {
