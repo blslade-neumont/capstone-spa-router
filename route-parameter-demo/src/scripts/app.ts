@@ -1,7 +1,8 @@
 import { Router } from '@aboveyou00/capstone-router';
 
 (async () => {
-    let router = new Router();
+    let router = new Router({ preloadStrategy: 'follow-links' });
+    router.preloadStrategy.delayPreloadMillis = 2000;
     router.addNavigationProgressBar();
     (<any>window).router = router;
     (<any>window).navigateTo = router.navigateTo.bind(router);

@@ -4,7 +4,8 @@ import 'rxjs/add/operator/filter';
 let router: Router;
 let isLoaded = false;
 (async () => {
-    router = new Router();
+    router = new Router({ preloadStrategy: 'follow-links' });
+    router.preloadStrategy.delayPreloadMillis = 2000;
     router.addNavigationProgressBar();
     await router.dependencyLoader.loadSchema('/router-dependencies.json');
     await router.loadRoutes('routes');
