@@ -8,5 +8,10 @@
             "core-js",
             "nightwatch"
         ]
-    }
+    },
+    "exclude": [
+        "node_modules",
+        "bower_components",
+        "dist"
+    ]
 }
