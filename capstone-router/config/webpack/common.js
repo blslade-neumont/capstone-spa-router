@@ -6,6 +6,7 @@ const ROOT = path.resolve(__dirname, '../../');
 var defaultConfig = {
     devtool: 'cheap-module-source-map',
     cache: true,
+    mode: 'development',
     
     output: {
         filename: '[name].js',

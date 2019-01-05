@@ -247,7 +247,7 @@ function addDependencies(dependencyLoader: DependencyLoader, dependencies: Schem
         
         context.strokeStyle = 'green';
         context.lineWidth = 3;
-        context.lineCap = 'arrow';
+        // context.lineCap = 'arrow';
         context.beginPath();
         for (let dep of dependencies) {
             let rightBtn = dependencyBtnMap.get(dep.name);

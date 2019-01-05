@@ -4,6 +4,7 @@ var path = require('path');
 var defaultConfig = {
     devtool: 'source-map',
     cache: true,
+    mode: 'development',
     
     output: {
         filename: '[name].bundle.js',

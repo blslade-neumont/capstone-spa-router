@@ -27,7 +27,7 @@ let devConfig = {
     ],
 
     module: {
-        loaders: [
+        rules: [
             { test: /\.ts$/, loaders: [$awesomeTypescript], exclude: /\.spec\.ts$/ },
             { test: /\.tpl.html$/, loaders: [$raw] }
         ]

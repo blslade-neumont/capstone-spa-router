@@ -49,7 +49,7 @@ let devConfig = {
     ],
 
     module: {
-        loaders: [
+        rules: [
             { test: /\.ts$/, loaders: [$awesomeTypescript], exclude: /\.spec\.ts$/ },
             { test: /\.scss$/, loaders: [$style, $css, $postcss, $sass] }
         ]
